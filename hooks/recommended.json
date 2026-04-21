@@ -1,0 +1,18 @@
+{
+  "hooks": {
+    "PreToolUse": [{
+      "matcher": "Write",
+      "hooks": [{ "type": "command", "command": "hooks/shims/pre-write.sh" }]
+    }],
+    "PostToolUse": [{
+      "matcher": "Write|Edit",
+      "hooks": [{ "type": "command", "command": "hooks/shims/post-write.sh" }]
+    }],
+    "UserPromptSubmit": [{
+      "hooks": [{ "type": "command", "command": "hooks/shims/prompt-hint.sh" }]
+    }],
+    "SessionStart": [{
+      "hooks": [{ "type": "command", "command": "hooks/shims/session-start.sh" }]
+    }]
+  }
+}

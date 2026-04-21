@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/marketplace.json",
+  "name": "galmuri",
+  "owner": { "name": "jazz1x", "url": "https://github.com/jazz1x" },
+  "plugins": [{
+    "name": "galmuri",
+    "source": ".",
+    "description": "흩어진 맥락을 갈무리한다. 요약·정리·퇴고·문서화·의사결정 덱을 위한 Claude Code 플러그인.",
+    "version": "0.1.0",
+    "tags": ["summarize", "decision-deck", "documentation", "i18n"]
+  }]
+}

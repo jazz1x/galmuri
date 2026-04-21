@@ -1,0 +1,17 @@
+{
+  "name": "galmuri",
+  "version": "0.1.0",
+  "description": "Korean for 'gathering, organizing, and storing with care.' Turns sprawling context into well-kept summaries.",
+  "author": {
+    "name": "jazz1x",
+    "url": "https://github.com/jazz1x/galmuri"
+  },
+  "homepage": "https://github.com/jazz1x/galmuri",
+  "license": "MIT",
+  "keywords": ["summarize", "compress", "decision", "pptx", "documentation", "korean"],
+  "skills": [
+    { "name": "decide",  "path": "skills/decide"  },
+    { "name": "distill", "path": "skills/distill" },
+    { "name": "shrink",  "path": "skills/shrink"  }
+  ]
+}
