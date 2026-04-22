@@ -1,0 +1,20 @@
+{
+  "units": [{
+    "id": "eu-review-sla-1",
+    "claim": "코드 리뷰는 4시간 내 완료한다",
+    "essence": "팀 리드가 리뷰 SLA를 강제한다",
+    "decomposition": {
+      "role_D": "팀 리드",
+      "role_E": "리뷰 할당 개발자",
+      "role_V": "CI 파이프라인",
+      "role_R": "당직 엔지니어"
+    },
+    "evidence": ["Engineering handbook §4.2"],
+    "socratic_pass": { "definition": false, "difference": true, "attribution": true },
+    "tags": ["audience:eng-team"]
+  }],
+  "mode": "reduce",
+  "ratio": 0.2,
+  "dropped": [],
+  "source_ref": ".galmuri/tmp/source-review-sla.txt"
+}

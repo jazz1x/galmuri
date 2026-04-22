@@ -1,0 +1,50 @@
+---
+name: explain
+description: >
+  나 이해용 inline 어댑터. distill 엔진을 호출하여 긴 텍스트의 본질을 뽑고 inline markdown 으로 렌더.
+  audience=me 자동 고정. 출력만 하며 파일 생성 없음.
+  Triggers: "설명해", "이해하게", "explain", "정리해서 보여줘", "readme 읽고", "shrink", "줄여줘", "압축"
+version: 0.1.0
+---
+
+# galmuri:explain — 나 이해용 정리
+
+## Prerequisites
+- `scripts/preflight.sh` 통과 (jq, bats, bash).
+- `skills/distill/` 엔진 설치됨.
+
+## Step 1: Alias 감지 + Input Capture
+
+`shrink` / `줄여줘` / `압축` 키워드로 진입 시:
+```bash
+if [ ! -f ".galmuri/tmp/.warned-shrink" ]; then
+  echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. CHANGELOG 0.2.0 에서 제거 예정." >&2
+  touch ".galmuri/tmp/.warned-shrink"
+fi
+# source_tokens < 80 → explain 수행, 그 외 → 재위임 안내
+```
+
+- 사용자 입력 (파일 경로 또는 stdin) 을 `.galmuri/tmp/source-{slug}.txt` 에 넣음.
+  입력 경로 없는 경우: "설명할 파일 경로나 텍스트를 알려주세요. 예: `README.md` — 무엇을 설명할까요?"
+- audience 는 `me` 자동 고정 (별도 질의 없음).
+
+## Step 2: Engine Invoke
+> Claude Code skill 프레임워크에서 어댑터가 엔진을 호출하는 공식 경로는 **동일 세션 내 `distill` skill 을 Skill tool 로 호출** 하는 것.
+> 호출 시 전달 인자:
+>   - `--mode reduce`
+>   - `--ratio 0.2`
+>   - `--audience me`
+>   - `--input` = Step 1 의 tmp 파일 경로
+> 엔진 응답은 EngineOutput JSON 으로 반환받고 Step 3 이 이어 렌더.
+
+## Step 3: Render
+- EngineOutput.units → inline markdown:
+  - 첫 unit 의 `claim` 을 상단 요약으로.
+  - 각 unit 의 `essence` 를 bullet 로 나열.
+
+## Step 4: Output
+- stdout 에 markdown 출력. **파일 생성 단계 없음** (설계 의도).
+- 세션 종료 시 `.galmuri/tmp/source-{slug}.txt` 자동 정리 (훅).
+
+## Output Schema
+markdown body only. JSON 출력 없음.

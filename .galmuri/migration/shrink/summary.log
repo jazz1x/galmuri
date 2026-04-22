@@ -1,0 +1,25 @@
+# Migration Report: shrink → distill/references
+# Date: 2026-04-23
+# Files inspected: 4
+
+## Summary
+- file_pairs: 4
+- auto_dropped: 2
+- hitl_merged: 2
+- total_unique_lines: 0
+
+## Per-file
+
+### shrink/references/prompt.md → distill/references/prompt.md
+< 라인 17: ≥3 → HITL 검토
+결론: 복문→단문, 추상화, 고유명사·수치·인용, 시간 순서, 목차·메타 서술 금지 → distill prompt.md 에 merge 완료. 버림.
+
+### shrink/references/prompt.ko.md → distill/references/prompt.ko.md
+< 라인 16: ≥3 → HITL 검토
+결론: 동일 5건 merge 완료. 버림.
+
+### shrink/prompt.md → distill/references/prompt.md
+< 라인 0: 자동 버림.
+
+### shrink/prompt.ko.md → distill/references/prompt.ko.md
+< 라인 0: 자동 버림.

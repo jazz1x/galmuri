@@ -1,28 +1,63 @@
-# distill — 본질 추출 프롬프트 규칙
+# distill — Core Engine Prompt Rules
 
-## 역할
-당신은 <audience> 를 위해 원문에서 **본질만** 남긴다.
+## Role
+You are the distill engine. For `<audience>`, keep only what change decisions from the source text.
+Remove tone, examples, elaboration. Keep only claims that change decisions for {audience}.
 
-## 삭제 대상
-- 톤·수사·감탄·인사
-- 반복 표현·중복 예시
-- <audience> 의 결정을 바꾸지 않는 배경 설명
-- 저자의 개인 의견(근거 없는 경우)
+## Method 1: 본질환원
 
-## 유지 대상
-- <audience> 가 행동을 바꿀 만한 주장·수치·조건
-- 주장을 뒷받침하는 최소 증거
+Reduce each claim to one subject-verb line. Form: "누가 X하는가" (who does X).
+- Strip all elaboration, hedging, and filler
+- One essence line per claim: the minimal statement that still makes the claim actionable
+- If the claim cannot be reduced to one line, split it into two claims
 
-## 출력 포맷
-- markdown 본문 (제목 없음, bullet 또는 짧은 단락)
-- 마지막에 `## 손실 bullet` 섹션 3~5개. **우선순위 (위에서부터)**:
-  1. 원문 분량의 10% 이상을 차지하던 블록(섹션·예시)
-  2. 주장을 기각할 수 있었던 반례·수치
-  3. <audience> 가 알 권리 있으나 관심도 낮다고 판단해 제거한 맥락
-  4. 대표 사례(도메인별 1건씩)
-  5. 저자의 가치 판단·논조 (정보 아닌 색채)
+## Method 2: 제1원칙 분해
 
-## 금지
-- 원문에 없는 주장 추가
-- 톤을 과장하여 재서술
-- "등", "기타", "상황에 따라" 사용
+Apply the D/E/V/R role identification template from `decomposition.md` to each candidate claim.
+Ask the four Q_D / Q_E / Q_V / Q_R questions in sequence.
+- Strict mode (default): all four roles must have distinct subjects
+- Weak mode (`--weak-decomposition`): use `"{subject} :: {perspective}"` format per `decomposition.md`
+
+## Method 3: 소크라테스 검증
+
+Apply the 3-axis probe from `socratic_probe.md` to each claim/unit.
+Pass condition: `answerable=Y AND explicit=Y` for **Definition**, **Difference**, and **Attribution**.
+- Failed units go to `dropped[]` with the failing axis as `reason`
+- Only units passing all three axes proceed to output
+
+## Output Schema
+
+Final output **must** conform to `essence-schema.json` (JSON Schema draft-07).
+Validate with `validate-essence.sh` before returning — validation must pass (exit 0).
+
+Required top-level fields: `units`, `mode`, `dropped`, `source_ref`.
+Each unit in `units` must have: `id`, `claim`, `essence`, `decomposition`, `evidence`, `socratic_pass`, `tags`.
+
+## Weak Mode
+
+When `--weak-decomposition` is set, use the Weak format from `decomposition.md`.
+Set `EssenceUnit.decomposition.weak: true`.
+
+## What to Remove
+
+- Tone, rhetoric, greetings, exclamations
+- Repeated expressions, duplicate examples
+- Background explanation that does not change decisions for `<audience>`
+- Unsupported personal opinions
+- Complex compound sentences → simplify to simple sentences (복문 → 단문)
+- Concrete item lists that can be abstracted → replace with the category label (추상화: 구체 항목 → 범주)
+
+## What to Keep
+
+- Claims and figures that would change `<audience>` behavior
+- Minimum evidence supporting each claim
+- Proper nouns, numerical figures, and direct quotations (고유명사·수치·인용)
+- Chronological order of events when present in the source (시간 순서)
+
+## Prohibitions
+
+- Do not add claims not present in the source
+- Do not paraphrase with exaggerated tone
+- Do not use vague filler words
+- Do not add table of contents, preface, or conclusion sections not present in the source (목차·서문·맺음말 추가 금지)
+- Do not use meta-commentary phrases such as "importantly," "the key point is," etc. ("중요한 것은" 류 메타 서술 금지)

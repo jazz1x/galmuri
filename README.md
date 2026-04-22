@@ -2,34 +2,43 @@
 
 > Claude Code plugin — gather, organize, and keep context
 
-![version](https://img.shields.io/badge/version-0.0.1-blue)
+![version](https://img.shields.io/badge/version-0.1.0-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
 
-**galmuri** (갈무리) — Korean for *"gathering, organizing, and storing with care."* Turns sprawling context into well-kept summaries with explicit loss transparency, evidence grounding, and a decision-deck template engine.
+**galmuri** (갈무리) — Korean for *"gathering, organizing, and storing with care."* Turns sprawling context into well-kept summaries with explicit loss transparency, evidence grounding, and a deck template engine.
 
 [한국어](./README.ko.md)
 
-## Skills
+## Architecture
 
-| Skill | Command | Role |
-|-------|---------|------|
-| **distill** | `/galmuri:distill` | Extract essence for a specific audience (tone/examples/elaboration removed; claims only) |
-| **shrink** | `/galmuri:shrink` | Compress to a target token ratio with retry loop and loss diff |
-| **decide** | `/galmuri:decide` | Turn 2-option decisions into a 6-slide Jobs-style template (JSON + markdown, no binary build) |
-
-Each skill runs in an **independent orbit**, connected only through **shared artifacts (files)**.
+galmuri is organized as **one engine + four adapters**:
 
 ```
-distill ──→  docs/galmuri-{slug}.md        (essence + loss bullets)
-                ↓
-shrink  ──→  docs/galmuri-{slug}.md        (target-ratio compression + loss diff)
-                ↓
-decide  ──→  docs/galmuri-decide-{slug}.json  (slide copy + design_intent)
-             docs/galmuri-decide-{slug}.md   (presentation script + 18 Socratic notes)
+                    ┌─────────────────────────────────┐
+                    │         distill (engine)         │
+                    │  reduce · ratio · socratic probe │
+                    └───────────────┬─────────────────┘
+                                    │ EngineOutput JSON
+              ┌─────────┬───────────┼───────────┬─────────┐
+              ▼         ▼           ▼           ▼         ▼
+           explain    pitch        doc         deck
+          (inline)  (3-5 lines)  (file)    (JSON+md)
 
-     └── .galmuri/ (asset index: audience, summary, decision-deck, evidence-trace)
+                              deck presets
+                    ┌──────────────────────────────────┐
+                    │ decision-sandwich-6  pitch-deck   │
+                    │ concept-explain      story-arc    │
+                    └──────────────────────────────────┘
 ```
+
+| Skill | Role | Output |
+|-------|------|--------|
+| **distill** | Extract essence — audience-tuned, D/E/V/R decomposition, Socratic probe | EngineOutput JSON (internal) |
+| **explain** | Inline markdown summary for the author (`audience=me` auto-fixed) | stdout only |
+| **pitch** | Hook-Core-CTA in 3–5 lines for a named audience | stdout only |
+| **doc** | Distilled markdown saved to `docs/` | `docs/galmuri-doc-{slug}.md` |
+| **deck** | Structured slide copy (JSON + markdown) using Jobs-inspired design tokens | `galmuri-deck-{slug}.json` + `galmuri-deck-{slug}.md` |
 
 ## Install
 
@@ -41,12 +50,6 @@ Inside a Claude Code session, run:
 /plugin marketplace add https://github.com/jazz1x/galmuri.git
 ```
 
-Expected output:
-
-```
-✓ Marketplace 'galmuri' added (1 plugin)
-```
-
 ### 2. Install the plugin
 
 ```
@@ -56,7 +59,7 @@ Expected output:
 Expected output:
 
 ```
-✓ Installed galmuri@0.0.1 — 3 skills registered (distill, shrink, decide)
+✓ Installed galmuri@0.1.0 — 5 skills registered (distill, explain, pitch, doc, deck)
 ```
 
 ### 3. Verify
@@ -65,12 +68,14 @@ Expected output:
 /plugin list
 ```
 
-You should see `galmuri` in the list. If the three slash commands below autocomplete, you're good:
+All five slash commands should autocomplete:
 
 ```
 /galmuri:distill
-/galmuri:shrink
-/galmuri:decide
+/galmuri:explain
+/galmuri:pitch
+/galmuri:doc
+/galmuri:deck
 ```
 
 ### 4. (Optional) Install hooks
@@ -91,12 +96,6 @@ bash scripts/install-hooks.sh --user
 # writes → ~/.claude/settings.json
 ```
 
-Force-overwrite existing hook entries on conflict (skip HITL merge):
-
-```bash
-bash scripts/install-hooks.sh --force
-```
-
 See the [Hooks](#hooks) section for what each hook does.
 
 ### 5. Uninstall
@@ -106,88 +105,117 @@ See the [Hooks](#hooks) section for what each hook does.
 /plugin marketplace remove galmuri
 ```
 
-Hook entries added by `install-hooks.sh` remain in your `settings.json` — remove them manually or restore from the `.bak-<epoch>` file.
-
 ---
 
 ## Quickstart
 
-Just invoke the skill. It asks what it needs in plain language.
+Just invoke the adapter. It asks what it needs in plain language.
 
+**explain** — quick inline summary (no file created):
 ```
-user   > /galmuri:distill
-galmuri > 누구한테 보여줄 요약인가요? 예: 리뷰어, 팀 채널, 임원, 혹은 상황을 한 줄로 설명해주셔도 돼요.
-user   > 리뷰어한테 PR 설명용
-galmuri > 원문은? (파일 경로 / 붙여넣기 / git diff)
-user   > git diff main...HEAD
-galmuri > [추출 → 검증 → 손실 diff]
-          Save to docs/galmuri-pr-summary.md? (y / n / edit-slug)
-user   > y
-✓ Saved · asset recorded in .galmuri/assets/summary.jsonl
+user    > /galmuri:explain path/to/long-doc.md
+galmuri > [distill → inline markdown output]
 ```
 
-Same pattern for the others — bare invocation opens a conversation, no flag memorization:
-
+**pitch** — 3–5 line pitch for a specific audience:
 ```
-/galmuri:shrink   → "얼마나 줄일까요? (절반 / 핵심 / 한 줄 / 직접 비율)"
-/galmuri:decide   → "어떤 결정을 고민 중이세요? 한 줄로"
+user    > /galmuri:pitch
+galmuri > 누구를 위한 pitch 인가요? 예: 투자자, 팀, 고객
+user    > 팀 전체 스프린트 킥오프용
+galmuri > [Hook-Core-CTA, 3–5 lines]
 ```
 
-Power users can skip the questions by passing args directly — see [Usage](#usage).
+**doc** — distilled markdown saved to file:
+```
+user    > /galmuri:doc path/to/source.md
+galmuri > 누구를 위한 문서인가요? 예: 팀 전체, 나중의 나, 외부 리뷰어
+user    > 나중의 나
+galmuri > Save to docs/galmuri-doc-source.md? (y / n / edit-slug)
+user    > y
+✓ Saved · asset recorded in .galmuri/
+```
+
+**deck** — structured slide copy:
+```
+user    > /galmuri:deck
+galmuri > 어떤 내용을 슬라이드로 만들까요?
+user    > Postgres vs SQLite 마이그레이션 결정
+galmuri > [decision-sandwich-6 preset auto-applied]
+          → galmuri-deck-postgres-vs-sqlite.json
+          → galmuri-deck-postgres-vs-sqlite.md
+```
 
 ## Usage
 
-### 1. Distill (essence extraction)
+### distill (engine)
 
-Conversational (default):
+Produces EngineOutput JSON consumed by adapters. Direct invocation useful for piping or scripting.
+
 ```
-/galmuri:distill
-→ "누구한테 보여줄 요약인가요? 예: 리뷰어, 팀 채널, 임원…"
-→ user replies in any form — audience is inferred
-→ source prompt → distill → verify → loss diff → HITL save
+/galmuri:distill path/to/source.md --audience exec --ratio 0.2
 ```
 
-With flags (skip the question):
+Flags: `--mode reduce`, `--ratio`, `--audience`, `--weak-decomposition`, `--input`
+
+### explain (adapter)
+
+Inline summary for the author. No file created, no audience query.
+
 ```
-/galmuri:distill path/to/source.md --audience exec
+/galmuri:explain path/to/source.md
 ```
 
-### 2. Shrink (target-ratio compression)
+Natural language triggers: `설명해`, `이해하게`, `정리해서 보여줘`, `readme 읽고`
 
-Conversational (default):
-```
-/galmuri:shrink
-→ "얼마나 줄일까요? 예: '절반' / '핵심만 (5분)' / '한 줄 TL;DR' / 비율 (0.05~0.5)"
-→ reply mapped to ratio (절반→0.5, 핵심→0.2, 한줄→0.05)
-→ source prompt → compress (max 2 retries if |actual-target|>5%) → HITL save
-→ on ratio miss: [a]ccept / [r]e-target / [c]ancel
-```
+### pitch (adapter)
 
-With flags:
+3–5 line Hook-Core-CTA for a named audience.
+
 ```
-/galmuri:shrink path/to/source.md --target-ratio 0.2 --audience exec [--show-loss]
+/galmuri:pitch path/to/source.md --audience investor
 ```
 
-### 3. Decide (decision deck template)
+Natural language triggers: `pitch 해`, `한 문단으로`, `소개해줘`
 
-Conversational (default):
-```
-/galmuri:decide
-→ "어떤 결정을 고민 중이세요? 한 줄로 — 예: 'Postgres 로 갈지 SQLite 유지할지'"
-→ 5-step protocol: Phenomenon → Decomposition (D/E/V/R) → Essence → Generalization → Reconstruction
-→ Strict mode requires D/E/V/R on distinct subjects
-```
+### doc (adapter)
 
-With flags:
+Distilled markdown saved to `docs/galmuri-doc-{slug}.md`.
+
 ```
-/galmuri:decide "Postgres vs SQLite 마이그레이션" --weak-decomposition
+/galmuri:doc path/to/source.md --audience team
 ```
 
-Output: 2 template files (no binary build)
-- `{slug}.json` — slide copy + design_intent (Jobs tokens)
-- `{slug}.md` — presentation script + 18 Socratic probe questions (Definition × Difference × Attribution)
+Natural language triggers: `문서로`, `정리해서 저장`, `기록으로`
 
-Consumers render via Keynote / PowerPoint / Figma / Slidev / Marp.
+### deck (adapter)
+
+Structured slide copy — Jobs-inspired design tokens (SF Pro, 16:9, dark-light-dark pattern), rendered as JSON + markdown. No binary file build.
+
+```
+/galmuri:deck path/to/source.md --preset decision-sandwich-6
+```
+
+Presets:
+
+| Preset | Slides | Use case |
+|--------|--------|----------|
+| `decision-sandwich-6` | 6 | Two-option decision with D/E/V/R decomposition |
+| `pitch-deck` | 3 | Short investor or team pitch |
+| `concept-explain` | 4–5 | Concept introduction |
+| `story-arc` | varies | Narrative-structured content |
+
+Natural language triggers: `슬라이드로`, `deck 만들어`, `발표자료`
+
+## Backwards Compatibility
+
+`decide` and `shrink` trigger phrases are routed to context-appropriate adapters in 0.1.x. They will be **removed in 0.2.0**.
+
+| Old trigger | Routes to |
+|-------------|-----------|
+| `decide`, `결정` | `deck --preset decision-sandwich-6` |
+| `shrink`, `줄여줘`, `압축` | `explain` (short source) or `doc` (long source) |
+
+A one-time deprecation warning fires per session on first use of the old trigger.
 
 ## Contributing
 
@@ -211,38 +239,31 @@ galmuri ships recommended hooks in `hooks/recommended.json`. `scripts/install-ho
 
 | Event | Trigger | What it does |
 |-------|---------|--------------|
-| `PreToolUse` | Write to `docs/galmuri-*.md` | Runs `evidence-check.sh` structure gate before save |
-| `PostToolUse` | Write/Edit of galmuri outputs | Records the output as an asset in `.galmuri/assets/` |
-| `UserPromptSubmit` | Prompt matches any skill's trigger phrase (e.g. `핵심만`, `압축`, `결정`) | Injects a hint routed to the specific skill (distill/shrink/decide) |
+| `PreToolUse` | Any skill invocation | Captures source to `.galmuri/tmp/` |
+| `PostToolUse` | Write/Edit of galmuri outputs | Records the output as an asset in `.galmuri/` |
+| `UserPromptSubmit` | Prompt matches skill trigger phrases | Injects a hint routed to the matching adapter |
 | `SessionStart` | Session begins | Injects recent audience context from past assets |
 
 Hooks are opt-in — all skills work without them.
 
 ## Assets
 
-Every output is recorded in `.galmuri/assets/*.jsonl` with a SHA-256 NFC-normalized hash of the source. Five asset types:
+Every output is recorded in `.galmuri/*.jsonl` with metadata. Asset types:
 
 | Type | Captured when |
 |------|---------------|
-| `summary` | distill/shrink output saved |
-| `decision-deck` | decide template built |
-| `compression-pattern` | Recurring compression ratios / audience patterns detected |
-| `evidence-trace` | evidence-check passes (claim → source mapping) |
-| `recovery-trace` | Socratic probe recovery loop fires |
+| `summary` | distill/explain/doc output |
+| `deck` | deck template built |
+| `pitch` | pitch output |
+| `evidence-trace` | evidence-check passes |
 
-Consolidate duplicates + rebuild index:
-
-```bash
-bash scripts/consolidate-assets.sh
-```
-
-Query past assets (used by skills' Step 2 and the SessionStart hook):
+Query past assets:
 
 ```bash
 bash scripts/query-assets.sh --tags audience --limit 3 --format inject
 ```
 
-`.galmuri/assets/` and `.galmuri/index.jsonl` are gitignored by default.
+`.galmuri/` is gitignored by default.
 
 ## Sibling Integration (optional)
 
@@ -250,52 +271,17 @@ galmuri reads sibling plugin state when present, silently skips when absent:
 
 | Source | When read | Effect |
 |--------|-----------|--------|
-| `.harnish/persona.json` | distill/shrink Step 1 | Suggests default audience from persona (user `--audience` wins) |
-| `.harnish/assets/*.jsonl` | All skills Step 2 | Tag-based context injection via `harnish-bridge.sh` |
-| `.honne/recent-reflection.md` | decide Step 1 | One-line hint if relevant to the decision |
-| `.honne/persona.json` | distill/shrink Step 1 | Reflects `formality` / `verbosity` only (other fields ignored) |
-
-All reflections are surfaced to the user explicitly (HITL `[a]ccept / [c]hange / [i]gnore`). No silent tone shifts.
-
-## Fork & Customize
-
-Three ways to use this repo as a base:
-
-### A. Cherry-pick a single skill into your project
-
-```bash
-mkdir -p .claude/skills
-cp -r /path/to/galmuri/skills/distill .claude/skills/
-```
-
-The skill is available as `distill` (no plugin namespace). Replace with `shrink` or `decide`.
-
-### B. Fork as your own plugin marketplace
-
-```bash
-gh repo fork jazz1x/galmuri --clone
-cd galmuri
-# edit .claude-plugin/plugin.json (name, author, repository)
-# edit .claude-plugin/marketplace.json (owner, plugin entries)
-git commit -am "fork: rebrand"
-git push
-```
-
-### C. Use as read-only upstream
-
-```bash
-git clone https://github.com/jazz1x/galmuri.git
-cd your-project
-claude --plugin-dir /path/to/galmuri
-git -C /path/to/galmuri pull   # update later
-```
+| `.harnish/persona.json` | distill Step 1 | Suggests default audience from persona |
+| `.honne/persona.json` | distill Step 1 | Reflects `formality` / `verbosity` only |
 
 ## Naming
 
 - **galmuri** (갈무리) = gather + organize + keep (Korean native word)
 - **distill** = remove tone and scaffolding, keep only claims that change decisions
-- **shrink** = target-ratio compression with explicit loss transparency
-- **decide** = 2-option fork → D/E/V/R decomposition → 6-slide Jobs-style deck
+- **explain** = inline, self-directed summary (audience=me)
+- **pitch** = concise Hook-Core-CTA for a named audience
+- **doc** = distilled document saved to file
+- **deck** = structured slide copy with Jobs-inspired design tokens
 
 ## Triad
 
@@ -308,7 +294,7 @@ harnish (make)  ──→  honne (know)  ──→  galmuri (keep)
 
 - [harnish](https://github.com/jazz1x/harnish) — autonomous implementation engine
 - [honne](https://github.com/jazz1x/honne) — evidence-backed self-reflection (6-axis persona)
-- [galmuri](https://github.com/jazz1x/galmuri) — summary · decision-deck · documentation (formerly *hanashi*)
+- [galmuri](https://github.com/jazz1x/galmuri) — summary · deck · documentation
 
 ## Footnote
 

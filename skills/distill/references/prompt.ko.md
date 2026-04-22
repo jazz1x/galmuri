@@ -1,28 +1,63 @@
-# distill — 본질 추출 프롬프트 규칙
+# distill — 코어 엔진 프롬프트 규칙
 
 ## 역할
-당신은 <audience> 를 위해 원문에서 **본질만** 남긴다.
+당신은 distill 엔진이다. `<audience>` 를 위해 원문에서 **결정을 바꾸는 것만** 남긴다.
+Remove tone, examples, elaboration. Keep only claims that change decisions for {audience}.
+
+## Method 1: 본질환원
+
+각 claim 을 주어-동사 한 줄로 환원. "누가 X하는가" 형태.
+- 부연·수식·군더더기 전부 제거
+- claim 당 essence 한 줄: 행동 가능성을 유지하는 최소 진술
+- 한 줄로 환원 불가 시 두 개의 claim 으로 분리
+
+## Method 2: 제1원칙 분해
+
+`decomposition.md` 의 D/E/V/R 역할 식별 질문 템플릿을 각 claim 에 적용.
+Q_D / Q_E / Q_V / Q_R 4 질문을 순서대로 적용.
+- Strict 모드 (기본): 4 역할 모두 distinct subject
+- Weak 모드 (`--weak-decomposition`): `decomposition.md` 의 Weak 예시 포맷 준수
+
+## Method 3: 소크라테스 검증
+
+`socratic_probe.md` 의 3축 probe 를 각 claim/unit 에 적용.
+통과 조건: **Definition**, **Difference**, **Attribution** 3축 모두 `answerable=Y AND explicit=Y`.
+- 실패 unit 은 실패 축을 `reason` 으로 `dropped[]` 에 기록
+- 3축 모두 통과한 unit 만 output 에 진입
+
+## 출력 스키마
+
+최종 출력은 `essence-schema.json` 스키마(JSON Schema draft-07)를 따르는 JSON.
+`validate-essence.sh` 로 검증 통과 필수 (exit 0).
+
+필수 최상위 필드: `units`, `mode`, `dropped`, `source_ref`.
+각 unit: `id`, `claim`, `essence`, `decomposition`, `evidence`, `socratic_pass`, `tags`.
+
+## Weak 모드
+
+`--weak-decomposition` 플래그 시 `decomposition.md` 의 Weak 예시 포맷 준수.
+`EssenceUnit.decomposition.weak: true` 설정.
 
 ## 삭제 대상
+
 - 톤·수사·감탄·인사
 - 반복 표현·중복 예시
-- <audience> 의 결정을 바꾸지 않는 배경 설명
-- 저자의 개인 의견(근거 없는 경우)
+- `<audience>` 의 결정을 바꾸지 않는 배경 설명
+- 근거 없는 개인 의견
+- 복문 → 단문 (압축 전술: 복잡한 복합문은 단순문으로 분해)
+- 추상화 가능한 구체 항목 나열 → 범주 라벨로 치환
 
 ## 유지 대상
-- <audience> 가 행동을 바꿀 만한 주장·수치·조건
-- 주장을 뒷받침하는 최소 증거
 
-## 출력 포맷
-- markdown 본문 (제목 없음, bullet 또는 짧은 단락)
-- 마지막에 `## 손실 bullet` 섹션 3~5개. **우선순위 (위에서부터)**:
-  1. 원문 분량의 10% 이상을 차지하던 블록(섹션·예시)
-  2. 주장을 기각할 수 있었던 반례·수치
-  3. <audience> 가 알 권리 있으나 관심도 낮다고 판단해 제거한 맥락
-  4. 대표 사례(도메인별 1건씩)
-  5. 저자의 가치 판단·논조 (정보 아닌 색채)
+- `<audience>` 가 행동을 바꿀 만한 주장·수치·조건
+- 주장을 뒷받침하는 최소 증거
+- 고유명사·수치·인용 (원문 그대로 유지)
+- 원문에 시간 순서가 있는 경우 해당 순서 보존
 
 ## 금지
+
 - 원문에 없는 주장 추가
 - 톤을 과장하여 재서술
-- "등", "기타", "상황에 따라" 사용
+- 모호한 군더더기 표현 사용
+- 원문에 없는 목차·서문·맺음말 추가
+- "중요한 것은", "핵심은" 등 메타 서술 문구 사용

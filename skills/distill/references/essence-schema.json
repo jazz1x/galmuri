@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "EngineOutput",
+  "type": "object",
+  "required": ["units", "mode", "dropped", "source_ref"],
+  "properties": {
+    "units": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/EssenceUnit" }
+    },
+    "mode": { "enum": ["reduce", "construct"] },
+    "ratio": { "type": "number", "minimum": 0.05, "maximum": 0.5 },
+    "dropped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["claim", "reason"],
+        "properties": {
+          "claim": { "type": "string" },
+          "reason": { "enum": ["definition", "difference", "attribution", "evidence"] }
+        }
+      }
+    },
+    "source_ref": { "type": "string" }
+  },
+  "definitions": {
+    "EssenceUnit": {
+      "type": "object",
+      "required": ["id", "claim", "essence", "decomposition", "evidence", "socratic_pass", "tags"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^eu-[a-z0-9-]+-[0-9]+$" },
+        "claim": { "type": "string" },
+        "essence": { "type": "string" },
+        "decomposition": {
+          "type": "object",
+          "required": ["role_D", "role_E", "role_V", "role_R"],
+          "properties": {
+            "weak": { "type": "boolean" },
+            "role_D": { "type": "string" },
+            "role_E": { "type": "string" },
+            "role_V": { "type": "string" },
+            "role_R": { "type": "string" }
+          }
+        },
+        "evidence": { "type": "array", "items": { "type": "string" } },
+        "socratic_pass": {
+          "type": "object",
+          "required": ["definition", "difference", "attribution"],
+          "properties": {
+            "definition": { "type": "boolean" },
+            "difference": { "type": "boolean" },
+            "attribution": { "type": "boolean" }
+          }
+        },
+        "tags": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  }
+}

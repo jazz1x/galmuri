@@ -1,0 +1,51 @@
+1c1
+< # Socratic Probe — 18문항 템플릿
+---
+> # Socratic Probe — 문항 템플릿
+3c3,4
+< > 6슬라이드 × 3축 (Definition / Difference / Attribution) = 18문항
+---
+> > N units × 3축 (Definition / Difference / Attribution) = 3N 문항
+> > (deck preset 의 경우 N = core_length + 2, 그 외 어댑터는 N = units.length)
+9,10c10,11
+< - **answerable**: 슬라이드 텍스트만으로 답변 가능한가? (Y/N)
+< - **explicit**: 답이 슬라이드에 명시적으로 적혀있는가? (Y/N)
+---
+> - **answerable**: claim/unit 텍스트만으로 답변 가능한가? (Y/N)
+> - **explicit**: 답이 claim/unit 에 명시적으로 적혀있는가? (Y/N)
+24c25
+< ## Slide 1 · Problem
+---
+> ## Unit · Problem
+26c27
+< - **Q1 Definition**: 이 의사결정의 한 줄 핵심 질문은?
+---
+> - **Q1 Definition**: 이 claim/unit 의 한 줄 핵심 질문은?
+30c31
+< ## Slide 2 · Concept
+---
+> ## Unit · Concept
+36c37
+< ## Slide 3 · Comparison
+---
+> ## Unit · Comparison
+42c43
+< ## Slide 4 · Examples
+---
+> ## Unit · Examples
+44,46c45,47
+< - **Q1 Definition**: 이 사례에서 분해는 어떻게 적용되는가?
+< - **Q2 Difference**: 이 사례는 다른 사례와 구조가 같은가?
+< - **Q3 Attribution**: 이 사례에서 실행은 누가 하는가?
+---
+> - **Q1 Definition**: 이 claim/unit 에서 분해는 어떻게 적용되는가?
+> - **Q2 Difference**: 이 claim/unit 은 다른 것과 구조가 같은가?
+> - **Q3 Attribution**: 이 claim/unit 에서 실행은 누가 하는가?
+48c49
+< ## Slide 5 · Trade-off
+---
+> ## Unit · Trade-off
+54c55
+< ## Slide 6 · Conclusion
+---
+> ## Unit · Conclusion

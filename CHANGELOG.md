@@ -5,6 +5,66 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+(Future versions planned. Scope TBD based on user feedback.)
+
+---
+
+## [0.1.0] — 2026-04-23
+
+### Added
+
+- **Engine/adapter architecture**: `distill` is now the shared engine producing EngineOutput JSON, consumed by four adapters (`explain`, `pitch`, `doc`, `deck`).
+
+- **explain adapter**: Inline markdown summary for the author. `audience=me` auto-fixed, no file created, no audience query.
+
+- **pitch adapter**: Hook-Core-CTA structure in 3–5 lines for a named audience.
+
+- **doc adapter**: Distilled markdown saved to `docs/galmuri-doc-{slug}.md` with audience selection and asset recording.
+
+- **deck adapter**: Structured slide copy (JSON + markdown) using Jobs-inspired design tokens (SF Pro, 16:9, dark-light-dark sandwich pattern). No binary file build.
+
+- **Four deck presets**: `decision-sandwich-6` (6-slide two-option decision), `pitch-deck` (3-slide), `concept-explain` (4–5 slides), `story-arc` (variable-length narrative).
+
+- **EngineOutput JSON schema** (`skills/distill/references/essence-schema.json`): JSON Schema draft-07 for `EssenceUnit` and top-level fields.
+
+- **scripts/validate-essence.sh**: Validates EngineOutput JSON against schema; exit 0 on pass, exit 1 on failure.
+
+- **scripts/preflight.sh**: Checks runtime prerequisites (jq, bash, bats); exit 3 with message on missing dependency.
+
+- **Deprecation alias routing**: `decide` and `shrink` trigger phrases route to context-appropriate adapters. One-time session-scoped warning via `.galmuri/tmp/.warned-{alias}`.
+
+### Changed
+
+- **distill skill** rewritten as a pure engine: flags `--mode`, `--ratio`, `--audience`, `--weak-decomposition`, `--input`. Outputs EngineOutput JSON; no longer handles save/render decisions.
+
+- **distill/references/prompt.md**: Merged compression tactics from shrink (복문→단문, 추상화, 고유명사·수치·인용, 시간 순서, 목차·메타 서술 금지). Added 본질환원/제1원칙/소크라테스 method sections.
+
+- **Hooks** (`hooks/recommended.json`): Updated to per-skill matchers for all five skills. Removed `decide` and `shrink` hook entries.
+
+- **Plugin version** bumped from `0.0.1` to `0.1.0`.
+
+### Deprecated
+
+- **shrink skill**: Trigger phrases (`shrink`, `줄여줘`, `압축`) route to `explain` or `doc`. Scheduled for removal in 0.2.0.
+
+- **decide skill**: Trigger phrases (`decide`, `결정`) route to `deck --preset decision-sandwich-6`. Scheduled for removal in 0.2.0.
+
+### Removed
+
+- `skills/decide/` — content migrated to `skills/deck/references/preset-decision-sandwich-6.md` and `skills/deck/references/design-tokens.md`.
+
+- `skills/shrink/` — compression tactics migrated to `skills/distill/references/prompt.md`.
+
+### Breaking
+
+- **EngineOutput JSON is the new inter-skill contract.** External integrations consuming distill's raw markdown output must adapt to the `EngineOutput` schema.
+
+- **`/galmuri:shrink` and `/galmuri:decide` commands removed.** Use `explain`, `doc`, or `deck` instead. Trigger phrase aliases remain for session routing in 0.1.x.
+
+---
+
 ## [0.0.1] — 2026-04-22
 
 ### Added
@@ -60,9 +120,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Custom LLM model selection within skills
 - Analytics/usage dashboard
 - CI integration for i18n validation
-
----
-
-## [Unreleased]
-
-(Future versions planned. Scope TBD based on user feedback.)

@@ -1,0 +1,80 @@
+1c1
+< # shrink — 분량 압축 프롬프트 규칙
+---
+> # distill — Core Engine Prompt Rules
+3,4c3,5
+< ## 목표
+< 원문을 <audience> 용으로 **target_tokens ±5%** 분량으로 압축.
+---
+> ## Role
+> You are the distill engine. For `<audience>`, keep only what change decisions from the source text.
+> Remove tone, examples, elaboration. Keep only claims that change decisions for {audience}.
+6,11c7
+< ## 전략 (우선순위)
+< 1. 중복 제거
+< 2. 예시 통합 (n개 → 1개)
+< 3. 부사·수식어 삭제
+< 4. 복문 → 단문
+< 5. 추상화 (구체 항목 → 범주)
+---
+> ## Method 1: 본질환원
+13,16c9,12
+< ## 유지 불변
+< - 고유명사·수치·인용
+< - 결론·판단
+< - 시간 순서
+---
+> Reduce each claim to one subject-verb line. Form: "누가 X하는가" (who does X).
+> - Strip all elaboration, hedging, and filler
+> - One essence line per claim: the minimal statement that still makes the claim actionable
+> - If the claim cannot be reduced to one line, split it into two claims
+18,21c14,57
+< ## 금지
+< - 원문에 없는 주장
+< - 목차·서문·맺음말 추가
+< - "중요한 것은" 류 메타 서술
+---
+> ## Method 2: 제1원칙 분해
+> 
+> Apply the D/E/V/R role identification template from `decomposition.md` to each candidate claim.
+> Ask the four Q_D / Q_E / Q_V / Q_R questions in sequence.
+> - Strict mode (default): all four roles must have distinct subjects
+> - Weak mode (`--weak-decomposition`): use `"{subject} :: {perspective}"` format per `decomposition.md`
+> 
+> ## Method 3: 소크라테스 검증
+> 
+> Apply the 3-axis probe from `socratic_probe.md` to each claim/unit.
+> Pass condition: `answerable=Y AND explicit=Y` for **Definition**, **Difference**, and **Attribution**.
+> - Failed units go to `dropped[]` with the failing axis as `reason`
+> - Only units passing all three axes proceed to output
+> 
+> ## Output Schema
+> 
+> Final output **must** conform to `essence-schema.json` (JSON Schema draft-07).
+> Validate with `validate-essence.sh` before returning — validation must pass (exit 0).
+> 
+> Required top-level fields: `units`, `mode`, `dropped`, `source_ref`.
+> Each unit in `units` must have: `id`, `claim`, `essence`, `decomposition`, `evidence`, `socratic_pass`, `tags`.
+> 
+> ## Weak Mode
+> 
+> When `--weak-decomposition` is set, use the Weak format from `decomposition.md`.
+> Set `EssenceUnit.decomposition.weak: true`.
+> 
+> ## What to Remove
+> 
+> - Tone, rhetoric, greetings, exclamations
+> - Repeated expressions, duplicate examples
+> - Background explanation that does not change decisions for `<audience>`
+> - Unsupported personal opinions
+> 
+> ## What to Keep
+> 
+> - Claims and figures that would change `<audience>` behavior
+> - Minimum evidence supporting each claim
+> 
+> ## Prohibitions
+> 
+> - Do not add claims not present in the source
+> - Do not paraphrase with exaggerated tone
+> - Do not use vague filler words
