@@ -185,7 +185,8 @@ harnish (make)  ──→  honne (know)  ──→  galmuri (keep)
 ```
 
 - [harnish](https://github.com/jazz1x/harnish) — autonomous implementation engine
-- [honne](https://github.com/jazz1x/honne) — self-reflection (under development)
+- [honne](https://github.com/jazz1x/honne) — evidence-backed self-reflection (6-axis persona)
+- [galmuri](https://github.com/jazz1x/galmuri) — summary · decision-deck · documentation (formerly *hanashi*)
 
 ## Footnote
 

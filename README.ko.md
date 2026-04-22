@@ -185,7 +185,8 @@ harnish (make)  ──→  honne (know)  ──→  galmuri (keep)
 ```
 
 - [harnish](https://github.com/jazz1x/harnish) — 자율 구현 엔진
-- [honne](https://github.com/jazz1x/honne) — 자기 성찰 (개발 중)
+- [honne](https://github.com/jazz1x/honne) — 증거 기반 자기 성찰 (6축 persona)
+- [galmuri](https://github.com/jazz1x/galmuri) — 요약 · 의사결정 덱 · 문서화 (구 *hanashi*)
 
 ## Footnote
 
