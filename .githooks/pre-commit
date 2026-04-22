@@ -29,4 +29,9 @@ for base in README.md; do
     || fail "README heading structure mismatch between $base and ${base%.md}.ko.md"
 done
 
+# 4. Full manifest test suite (skip with GALMURI_SKIP_TESTS=1)
+if [[ "${GALMURI_SKIP_TESTS:-0}" != "1" ]] && command -v bats >/dev/null 2>&1; then
+  bash tests/run.sh >/dev/null || fail "tests/run.sh failed — run 'bash tests/run.sh' for details"
+fi
+
 exit 0
