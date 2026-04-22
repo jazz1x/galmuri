@@ -1,6 +1,10 @@
 ---
 name: decide
-description: Turns ambiguous 2-option decisions into a 6-slide Jobs-style template (JSON + markdown, no binary build) + Socratic validation. Asks for the decision in natural language when no problem statement is given. Strict D/E/V/R decomposition; use --weak-decomposition for small teams.
+description: >
+  Turns ambiguous 2-option decisions into a 6-slide Jobs-style template (JSON + markdown, no binary
+  build) + Socratic validation. Asks for the decision in natural language when no problem statement
+  is given. Strict D/E/V/R decomposition; use --weak-decomposition for small teams.
+  Triggers: "decide", "결정", "의사결정", "A vs B", "고를까", "선택할까", "choose between", "deck".
 version: 0.0.1
 ---
 

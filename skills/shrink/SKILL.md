@@ -1,6 +1,10 @@
 ---
 name: shrink
-description: Compress text to a target token ratio for a specific audience. Asks for audience and ratio in natural language when --audience/--target-ratio are not given (valid ratio 0.05~0.5). Up to 2 retries; asks user on miss.
+description: >
+  Compress text to a target token ratio for a specific audience. Asks for audience and ratio in
+  natural language when --audience/--target-ratio are not given (valid ratio 0.05~0.5). Up to 2
+  retries; asks user on miss.
+  Triggers: "shrink", "압축", "줄여", "분량", "절반으로", "compress", "shorten", "condense".
 version: 0.0.1
 ---
 

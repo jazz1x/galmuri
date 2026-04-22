@@ -1,6 +1,9 @@
 ---
 name: decide
-description: 모호한 2선택 의사결정을 6슬라이드 Jobs-style 템플릿(JSON + markdown, 바이너리 빌드 없음) + 소크라테스 검증으로 변환. 문제 진술이 없으면 자연어로 물어본다. 엄격한 D/E/V/R 분해; 소규모 팀은 --weak-decomposition 사용.
+description: >
+  모호한 2선택 의사결정을 6슬라이드 Jobs-style 템플릿(JSON + markdown, 바이너리 빌드 없음) + 소크라테스 검증으로 변환.
+  문제 진술이 없으면 자연어로 물어본다. 엄격한 D/E/V/R 분해; 소규모 팀은 --weak-decomposition 사용.
+  Triggers: "decide", "결정", "의사결정", "A vs B", "고를까", "선택할까", "choose between", "deck".
 version: 0.0.1
 ---
 

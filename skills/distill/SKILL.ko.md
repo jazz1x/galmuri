@@ -1,6 +1,9 @@
 ---
 name: distill
-description: 긴 텍스트에서 특정 청자 대상의 본질을 추려낸다. 핵심 주장 + 손실 diff 반환. --audience 미제공 시 자연어로 물어본다. .harnish/.honne 자산 존재 시 활용 (미존재 시 자동 skip).
+description: >
+  긴 텍스트에서 특정 청자 대상의 본질을 추려낸다. 핵심 주장 + 손실 diff 반환.
+  --audience 미제공 시 자연어로 물어본다. .harnish/.honne 자산 존재 시 활용 (미존재 시 자동 skip).
+  Triggers: "distill", "핵심만", "추려", "요약해", "PR 본문", "TLDR", "tl;dr", "summarize", "essence".
 version: 0.0.1
 ---
 

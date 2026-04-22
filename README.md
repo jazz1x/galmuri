@@ -213,7 +213,7 @@ galmuri ships recommended hooks in `hooks/recommended.json`. `scripts/install-ho
 |-------|---------|--------------|
 | `PreToolUse` | Write to `docs/galmuri-*.md` | Runs `evidence-check.sh` structure gate before save |
 | `PostToolUse` | Write/Edit of galmuri outputs | Records the output as an asset in `.galmuri/assets/` |
-| `UserPromptSubmit` | Prompt matches `갈무리 \| galmuri \| tldr \| 핵심만 \| 추려서` | Injects a hint suggesting the relevant skill |
+| `UserPromptSubmit` | Prompt matches any skill's trigger phrase (e.g. `핵심만`, `압축`, `결정`) | Injects a hint routed to the specific skill (distill/shrink/decide) |
 | `SessionStart` | Session begins | Injects recent audience context from past assets |
 
 Hooks are opt-in — all skills work without them.

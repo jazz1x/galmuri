@@ -122,6 +122,26 @@ assert not bad, bad
   [ "$status" -eq 0 ]
 }
 
+@test "every SKILL.md description declares Triggers for auto-invocation" {
+  run python3 -c "
+import os, re
+root = '$REPO_ROOT/skills'
+bad = []
+for name in sorted(os.listdir(root)):
+    path = os.path.join(root, name, 'SKILL.md')
+    if not os.path.isfile(path): continue
+    head = open(path).read(2000)
+    if not head.startswith('---\n'): continue
+    fm = head.split('---\n', 2)[1]
+    desc_match = re.search(r'description:([\s\S]*?)(?=\n\w+:|$)', fm)
+    desc = desc_match.group(1) if desc_match else ''
+    if 'Triggers:' not in desc:
+        bad.append(f'{name}: description missing Triggers: line')
+assert not bad, bad
+"
+  [ "$status" -eq 0 ]
+}
+
 @test "every SKILL.md documents a natural-language fallback for missing args" {
   # Regression guard for the conversational-entry contract: when a user
   # invokes a skill bare, the skill must ask in plain language (not error

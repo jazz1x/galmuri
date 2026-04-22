@@ -1,6 +1,9 @@
 ---
 name: shrink
-description: 특정 청자 대상으로 텍스트를 목표 token 비율로 압축. --audience / --target-ratio 미제공 시 자연어로 물어본다 (유효 비율 0.05~0.5). 최대 2회 재시도; 실패 시 사용자 질문.
+description: >
+  특정 청자 대상으로 텍스트를 목표 token 비율로 압축.
+  --audience / --target-ratio 미제공 시 자연어로 물어본다 (유효 비율 0.05~0.5). 최대 2회 재시도; 실패 시 사용자 질문.
+  Triggers: "shrink", "압축", "줄여", "분량", "절반으로", "compress", "shorten", "condense".
 version: 0.0.1
 ---
 

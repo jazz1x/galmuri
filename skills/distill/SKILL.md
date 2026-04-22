@@ -1,6 +1,10 @@
 ---
 name: distill
-description: Distill the essence from long text for a specific audience. Returns core claims + a loss diff. Asks for audience in natural language when --audience is not given. Uses .harnish/.honne assets when present (silent skip otherwise).
+description: >
+  Distill the essence from long text for a specific audience. Returns core claims + a loss diff.
+  Asks for audience in natural language when --audience is not given. Uses .harnish/.honne assets
+  when present (silent skip otherwise).
+  Triggers: "distill", "핵심만", "추려", "요약해", "PR 본문", "TLDR", "tl;dr", "summarize", "essence".
 version: 0.0.1
 ---
 
