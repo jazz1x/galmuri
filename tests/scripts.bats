@@ -5,7 +5,7 @@ load "$BATS_TEST_DIRNAME/setup.bash"
 
 # ── parse-ratio.sh ──────────────────────────────────────────────────────────
 
-@test "parse-ratio: 절반 → 0.5" {
+@test "parse-ratio: korean jeolban -> 0.5" {
   run bash "$REPO_ROOT/scripts/parse-ratio.sh" "절반"
   [ "$status" -eq 0 ]
   [ "$output" = "0.5" ]
@@ -17,13 +17,13 @@ load "$BATS_TEST_DIRNAME/setup.bash"
   [ "$output" = "0.5" ]
 }
 
-@test "parse-ratio: 핵심만 → 0.2" {
+@test "parse-ratio: korean haeksimman -> 0.2" {
   run bash "$REPO_ROOT/scripts/parse-ratio.sh" "핵심만"
   [ "$status" -eq 0 ]
   [ "$output" = "0.2" ]
 }
 
-@test "parse-ratio: 한줄 → 0.05" {
+@test "parse-ratio: korean hanjul -> 0.05" {
   run bash "$REPO_ROOT/scripts/parse-ratio.sh" "한줄"
   [ "$status" -eq 0 ]
   [ "$output" = "0.05" ]
