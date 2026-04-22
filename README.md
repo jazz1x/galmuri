@@ -181,6 +181,14 @@ Output: 2 template files (no binary build)
 Consumers render via Keynote / PowerPoint / Figma / Slidev / Marp.
 ```
 
+## Contributing
+
+This repo ships a pre-commit guardrail at `.githooks/pre-commit` that blocks runtime artifacts, validates plugin JSON, and checks README heading parity between `README.md` and `README.ko.md`. Git does not auto-install repo hooks — enable once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 ## Hooks
 
 galmuri ships recommended hooks in `hooks/recommended.json`. `scripts/install-hooks.sh` merges them into `.claude/settings.json` with HITL conflict resolution.

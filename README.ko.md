@@ -181,6 +181,14 @@ User: /galmuri:decide
 Consumer 가 Keynote / PowerPoint / Figma / Slidev / Marp 로 렌더.
 ```
 
+## Contributing
+
+이 레포는 `.githooks/pre-commit` 에 가드레일 훅을 둔다 — 런타임 산출물 차단, 플러그인 JSON 검증, `README.md` ↔ `README.ko.md` 헤딩 동기화 확인. Git 은 레포 훅을 자동 설치하지 않으므로 클론당 한 번 활성화:
+
+```bash
+git config core.hooksPath .githooks
+```
+
 ## Hooks
 
 `hooks/recommended.json` 에 권장 훅이 정의되어 있다. `scripts/install-hooks.sh` 가 `.claude/settings.json` 에 HITL 충돌 해결과 함께 머지.
