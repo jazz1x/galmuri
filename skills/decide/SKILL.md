@@ -1,7 +1,7 @@
 ---
 name: galmuri:decide
 description: Turns ambiguous 2-option decisions into a 6-slide Jobs-style template (JSON + markdown, no binary build) + Socratic validation. Strict D/E/V/R decomposition; use --weak-decomposition for small teams.
-version: 0.1.0
+version: 0.0.1
 ---
 
 # galmuri:decide — 의사결정 덱

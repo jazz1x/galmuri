@@ -2,9 +2,34 @@
 
 > Claude Code 플러그인 — 맥락을 모으고, 정리하고, 갈무리한다
 
+![version](https://img.shields.io/badge/version-0.0.1-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
+![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
+
 **galmuri** (갈무리) — 한국어 순우리말로 *"잘 거두어 간수한다 / 일을 마무리한다"*. 흩어진 맥락을 손실 투명성·증거 근거·의사결정 덱 템플릿으로 갈무리한다.
 
 [English](./README.md)
+
+## Skills
+
+| Skill | Command | Role |
+|-------|---------|------|
+| **distill** | `/galmuri:distill` | 청자별 본질 추출 (톤·예시·부연 삭제, 주장만 유지) |
+| **shrink** | `/galmuri:shrink` | 목표 토큰 비율로 압축 + 재시도 루프 + 손실 diff |
+| **decide** | `/galmuri:decide` | 2지선택 결정 → 6슬라이드 Jobs-style 템플릿 (JSON + markdown, 바이너리 빌드 없음) |
+
+각 스킬은 **독립 궤도**에서 동작하며, 오직 **공유 아티팩트 (파일)** 로만 연결된다.
+
+```
+distill ──→  docs/galmuri-{slug}.md        (본질 + 손실 bullets)
+                ↓
+shrink  ──→  docs/galmuri-{slug}.md        (목표 비율 압축 + 손실 diff)
+                ↓
+decide  ──→  docs/galmuri-decide-{slug}.json  (슬라이드 카피 + design_intent)
+             docs/galmuri-decide-{slug}.md   (발표 스크립트 + 18 소크라테스 노트)
+
+     └── .galmuri/ (자산 인덱스: audience, summary, decision-deck, evidence-trace)
+```
 
 ## 설치
 
@@ -31,7 +56,7 @@ Claude Code 세션 안에서 실행:
 예상 출력:
 
 ```
-✓ Installed galmuri@0.1.0 — 3 skills registered (distill, shrink, decide)
+✓ Installed galmuri@0.0.1 — 3 skills registered (distill, shrink, decide)
 ```
 
 ### 3. 확인
@@ -118,27 +143,6 @@ user   > y
 ```
 /galmuri:shrink --target-ratio 0.2 --audience exec
 /galmuri:decide
-```
-
-## Skills
-
-| Skill | Command | Role |
-|-------|---------|------|
-| **distill** | `/galmuri:distill` | 청자별 본질 추출 (톤·예시·부연 삭제, 주장만 유지) |
-| **shrink** | `/galmuri:shrink` | 목표 토큰 비율로 압축 + 재시도 루프 + 손실 diff |
-| **decide** | `/galmuri:decide` | 2지선택 결정 → 6슬라이드 Jobs-style 템플릿 (JSON + markdown, 바이너리 빌드 없음) |
-
-각 스킬은 **독립 궤도**에서 동작하며, 오직 **공유 아티팩트 (파일)** 로만 연결된다.
-
-```
-distill ──→  docs/galmuri-{slug}.md        (본질 + 손실 bullets)
-                ↓
-shrink  ──→  docs/galmuri-{slug}.md        (목표 비율 압축 + 손실 diff)
-                ↓
-decide  ──→  docs/galmuri-decide-{slug}.json  (슬라이드 카피 + design_intent)
-             docs/galmuri-decide-{slug}.md   (발표 스크립트 + 18 소크라테스 노트)
-
-     └── .galmuri/ (자산 인덱스: audience, summary, decision-deck, evidence-trace)
 ```
 
 ## Usage

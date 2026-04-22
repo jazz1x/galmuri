@@ -2,9 +2,34 @@
 
 > Claude Code plugin — gather, organize, and keep context
 
+![version](https://img.shields.io/badge/version-0.0.1-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
+![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
+
 **galmuri** (갈무리) — Korean for *"gathering, organizing, and storing with care."* Turns sprawling context into well-kept summaries with explicit loss transparency, evidence grounding, and a decision-deck template engine.
 
 [한국어](./README.ko.md)
+
+## Skills
+
+| Skill | Command | Role |
+|-------|---------|------|
+| **distill** | `/galmuri:distill` | Extract essence for a specific audience (tone/examples/elaboration removed; claims only) |
+| **shrink** | `/galmuri:shrink` | Compress to a target token ratio with retry loop and loss diff |
+| **decide** | `/galmuri:decide` | Turn 2-option decisions into a 6-slide Jobs-style template (JSON + markdown, no binary build) |
+
+Each skill runs in an **independent orbit**, connected only through **shared artifacts (files)**.
+
+```
+distill ──→  docs/galmuri-{slug}.md        (essence + loss bullets)
+                ↓
+shrink  ──→  docs/galmuri-{slug}.md        (target-ratio compression + loss diff)
+                ↓
+decide  ──→  docs/galmuri-decide-{slug}.json  (slide copy + design_intent)
+             docs/galmuri-decide-{slug}.md   (presentation script + 18 Socratic notes)
+
+     └── .galmuri/ (asset index: audience, summary, decision-deck, evidence-trace)
+```
 
 ## Install
 
@@ -31,7 +56,7 @@ Expected output:
 Expected output:
 
 ```
-✓ Installed galmuri@0.1.0 — 3 skills registered (distill, shrink, decide)
+✓ Installed galmuri@0.0.1 — 3 skills registered (distill, shrink, decide)
 ```
 
 ### 3. Verify
@@ -118,27 +143,6 @@ Then compress further or turn a decision into a deck:
 ```
 /galmuri:shrink --target-ratio 0.2 --audience exec
 /galmuri:decide
-```
-
-## Skills
-
-| Skill | Command | Role |
-|-------|---------|------|
-| **distill** | `/galmuri:distill` | Extract essence for a specific audience (tone/examples/elaboration removed; claims only) |
-| **shrink** | `/galmuri:shrink` | Compress to a target token ratio with retry loop and loss diff |
-| **decide** | `/galmuri:decide` | Turn 2-option decisions into a 6-slide Jobs-style template (JSON + markdown, no binary build) |
-
-Each skill runs in an **independent orbit**, connected only through **shared artifacts (files)**.
-
-```
-distill ──→  docs/galmuri-{slug}.md        (essence + loss bullets)
-                ↓
-shrink  ──→  docs/galmuri-{slug}.md        (target-ratio compression + loss diff)
-                ↓
-decide  ──→  docs/galmuri-decide-{slug}.json  (slide copy + design_intent)
-             docs/galmuri-decide-{slug}.md   (presentation script + 18 Socratic notes)
-
-     └── .galmuri/ (asset index: audience, summary, decision-deck, evidence-trace)
 ```
 
 ## Usage

@@ -1,7 +1,7 @@
 ---
 name: galmuri:decide
 description: 모호한 2선택 의사결정을 6슬라이드 Jobs-style 템플릿(JSON + markdown, 바이너리 빌드 없음) + 소크라테스 검증으로 변환. 엄격한 D/E/V/R 분해; 소규모 팀은 --weak-decomposition 사용.
-version: 0.1.0
+version: 0.0.1
 ---
 
 # galmuri:decide — 의사결정 덱
