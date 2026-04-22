@@ -17,7 +17,7 @@ version: 0.0.1
 `shrink` / `줄여줘` / `압축` 키워드로 진입 시 — 토큰 수 측정 후 라우팅:
 ```bash
 if [ ! -f ".galmuri/tmp/.warned-shrink" ]; then
-  echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. CHANGELOG 0.2.0 에서 제거 예정." >&2
+  echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
   touch ".galmuri/tmp/.warned-shrink"
 fi
 TOKEN_COUNT=$(bash scripts/count-tokens.sh "$INPUT_FILE")

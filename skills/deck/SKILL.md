@@ -18,7 +18,7 @@ version: 0.0.1
 ```bash
 # deprecation 경고 (세션당 1회)
 if [ ! -f ".galmuri/tmp/.warned-decide" ]; then
-  echo "[deprecated] 'decide' 트리거는 deck --preset decision-sandwich-6 으로 라우팅됩니다. CHANGELOG 0.2.0 에서 제거 예정." >&2
+  echo "[deprecated] 'decide' 트리거는 deck --preset decision-sandwich-6 으로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
   touch ".galmuri/tmp/.warned-decide"
 fi
 ```

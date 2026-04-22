@@ -41,9 +41,9 @@
 
 ### Deprecated
 
-- **shrink 스킬**: 트리거 (`shrink`, `줄여줘`, `압축`) → `explain` 또는 `doc` 라우팅. 0.2.0 에서 제거 예정.
+- **shrink 스킬**: 트리거 (`shrink`, `줄여줘`, `압축`) → `explain` 또는 `doc` 라우팅. 향후 릴리스에서 제거 예정.
 
-- **decide 스킬**: 트리거 (`decide`, `결정`) → `deck --preset decision-sandwich-6` 라우팅. 0.2.0 에서 제거 예정.
+- **decide 스킬**: 트리거 (`decide`, `결정`) → `deck --preset decision-sandwich-6` 라우팅. 향후 릴리스에서 제거 예정.
 
 ### 제거
 
@@ -55,7 +55,7 @@
 
 - **EngineOutput JSON 이 스킬 간 계약.** distill 의 raw markdown 출력을 소비하던 외부 통합은 `EngineOutput` 스키마로 전환 필요.
 
-- **`/galmuri:shrink` 와 `/galmuri:decide` 명령 제거.** `explain`, `doc`, `deck` 을 사용. 트리거 phrase alias 는 0.1.x 세션 라우팅용으로 유지.
+- **`/galmuri:shrink` 와 `/galmuri:decide` 명령 제거.** `explain`, `doc`, `deck` 을 사용. 트리거 phrase alias 는 현재 0.0.x 라인의 세션 라우팅용으로 유지.
 
 ---
 
