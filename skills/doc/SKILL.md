@@ -18,7 +18,7 @@ version: 0.0.1
 `shrink` / `줄여줘` / `압축` 키워드로 진입 시:
 ```bash
 if [ ! -f ".galmuri/tmp/.warned-shrink" ]; then
-  echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. CHANGELOG 0.2.0 에서 제거 예정." >&2
+  echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
   touch ".galmuri/tmp/.warned-shrink"
 fi
 # source_tokens ≥ 80 AND ratio > 0.1 → doc 수행, 그 외 → 재위임 안내

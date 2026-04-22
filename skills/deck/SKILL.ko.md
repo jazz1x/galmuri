@@ -17,7 +17,7 @@ version: 0.0.1
 `decide` / `의사결정` / `A vs B` / `결정해` / `뭐가 나아` 키워드로 진입 시:
 ```bash
 if [ ! -f ".galmuri/tmp/.warned-decide" ]; then
-  echo "[deprecated] 'decide' 트리거는 deck --preset decision-sandwich-6 으로 라우팅됩니다. CHANGELOG 0.2.0 에서 제거 예정." >&2
+  echo "[deprecated] 'decide' 트리거는 deck --preset decision-sandwich-6 으로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
   touch ".galmuri/tmp/.warned-decide"
 fi
 ```

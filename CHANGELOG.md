@@ -41,9 +41,9 @@ Engine/adapter refactor (tracked under 0.0.1 development, not yet versioned as a
 
 ### Deprecated
 
-- **shrink skill**: Trigger phrases (`shrink`, `줄여줘`, `압축`) route to `explain` or `doc`. Scheduled for removal in 0.2.0.
+- **shrink skill**: Trigger phrases (`shrink`, `줄여줘`, `압축`) route to `explain` or `doc`. Scheduled for removal in a future release.
 
-- **decide skill**: Trigger phrases (`decide`, `결정`) route to `deck --preset decision-sandwich-6`. Scheduled for removal in 0.2.0.
+- **decide skill**: Trigger phrases (`decide`, `결정`) route to `deck --preset decision-sandwich-6`. Scheduled for removal in a future release.
 
 ### Removed
 
@@ -55,7 +55,7 @@ Engine/adapter refactor (tracked under 0.0.1 development, not yet versioned as a
 
 - **EngineOutput JSON is the new inter-skill contract.** External integrations consuming distill's raw markdown output must adapt to the `EngineOutput` schema.
 
-- **`/galmuri:shrink` and `/galmuri:decide` commands removed.** Use `explain`, `doc`, or `deck` instead. Trigger phrase aliases remain for session routing in 0.1.x.
+- **`/galmuri:shrink` and `/galmuri:decide` commands removed.** Use `explain`, `doc`, or `deck` instead. Trigger phrase aliases remain for session routing in the current 0.0.x line.
 
 ---
 

@@ -1,6 +1,7 @@
 .galmuri/assets/
 .galmuri/index.jsonl
 .galmuri/tmp/
+.galmuri/migration/
 .claude/settings.local.json
 .harnish/
 *.bak-*

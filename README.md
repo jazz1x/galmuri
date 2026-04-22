@@ -208,7 +208,7 @@ Natural language triggers: `슬라이드로`, `deck 만들어`, `발표자료`
 
 ## Backwards Compatibility
 
-`decide` and `shrink` trigger phrases are routed to context-appropriate adapters in 0.1.x. They will be **removed in 0.2.0**.
+`decide` and `shrink` trigger phrases are routed to context-appropriate adapters in the current 0.0.x line. They will be **removed in a future release**.
 
 | Old trigger | Routes to |
 |-------------|-----------|
