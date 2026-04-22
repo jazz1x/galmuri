@@ -121,3 +121,50 @@ assert not bad, bad
   run bash "$REPO_ROOT/scripts/i18n-sync-check.sh" "$REPO_ROOT/README.md"
   [ "$status" -eq 0 ]
 }
+
+@test "every SKILL.md description declares Triggers for auto-invocation" {
+  run python3 -c "
+import os, re
+root = '$REPO_ROOT/skills'
+bad = []
+for name in sorted(os.listdir(root)):
+    path = os.path.join(root, name, 'SKILL.md')
+    if not os.path.isfile(path): continue
+    head = open(path).read(2000)
+    if not head.startswith('---\n'): continue
+    fm = head.split('---\n', 2)[1]
+    desc_match = re.search(r'description:([\s\S]*?)(?=\n\w+:|$)', fm)
+    desc = desc_match.group(1) if desc_match else ''
+    if 'Triggers:' not in desc:
+        bad.append(f'{name}: description missing Triggers: line')
+assert not bad, bad
+"
+  [ "$status" -eq 0 ]
+}
+
+@test "every SKILL.md documents a natural-language fallback for missing args" {
+  # Regression guard for the conversational-entry contract: when a user
+  # invokes a skill bare, the skill must ask in plain language (not error
+  # out on a missing flag). The fallback example lives in SKILL.md prose.
+  # Heuristic: each SKILL.md body must contain at least one '예:' or 'e.g.'
+  # sample phrase tied to an ask, and must reference the user-facing
+  # question explicitly (ends with '?').
+  run python3 -c "
+import os, re
+root = '$REPO_ROOT/skills'
+bad = []
+for name in sorted(os.listdir(root)):
+    path = os.path.join(root, name, 'SKILL.md')
+    if not os.path.isfile(path): continue
+    body = open(path).read()
+    # Strip frontmatter
+    if body.startswith('---\n'):
+        body = body.split('---\n', 2)[2]
+    has_question = '?' in body
+    has_example = ('예:' in body) or ('e.g.' in body) or ('예시' in body)
+    if not (has_question and has_example):
+        bad.append(f'{name}: missing conversational fallback (question={has_question}, example={has_example})')
+assert not bad, bad
+"
+  [ "$status" -eq 0 ]
+}

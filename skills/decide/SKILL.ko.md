@@ -1,6 +1,9 @@
 ---
 name: decide
-description: 모호한 2선택 의사결정을 6슬라이드 Jobs-style 템플릿(JSON + markdown, 바이너리 빌드 없음) + 소크라테스 검증으로 변환. 엄격한 D/E/V/R 분해; 소규모 팀은 --weak-decomposition 사용.
+description: >
+  모호한 2선택 의사결정을 6슬라이드 Jobs-style 템플릿(JSON + markdown, 바이너리 빌드 없음) + 소크라테스 검증으로 변환.
+  문제 진술이 없으면 자연어로 물어본다. 엄격한 D/E/V/R 분해; 소규모 팀은 --weak-decomposition 사용.
+  Triggers: "decide", "결정", "의사결정", "A vs B", "고를까", "선택할까", "choose between", "deck".
 version: 0.0.1
 ---
 
@@ -10,6 +13,9 @@ version: 0.0.1
 - 없음. 외부 스킬/바이너리 의존 없음 (template-only output).
 
 ## Step 1: 현상 (Phenomenon)
+- 인자에 문제 진술이 없으면 사용자 언어로 질문:
+  > "어떤 결정을 고민 중이세요? 한 줄로 — 예: 'Postgres 로 갈지 SQLite 유지할지', '채용 공고 올릴지 말지'"
+  답변이 2선택 구조가 아니면 되묻기: "두 선택지를 A / B 형태로 알려주세요."
 - 한 줄 문제 진술 고정.
 - `.honne/recent-reflection.md` 있으면 관련성 체크 → 한 줄 힌트 주입.
 

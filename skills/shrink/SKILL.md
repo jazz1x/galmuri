@@ -1,6 +1,10 @@
 ---
 name: shrink
-description: Compress text to a target token ratio for a specific audience. Requires --audience and --target-ratio (0.1~0.5). Up to 2 retries; asks user on miss.
+description: >
+  Compress text to a target token ratio for a specific audience. Asks for audience and ratio in
+  natural language when --audience/--target-ratio are not given (valid ratio 0.05~0.5). Up to 2
+  retries; asks user on miss.
+  Triggers: "shrink", "압축", "줄여", "분량", "절반으로", "compress", "shorten", "condense".
 version: 0.0.1
 ---
 
@@ -13,6 +17,10 @@ distill 과 동일.
 distill SKILL.md 참조.
 
 ## Step 3: Target Sizing
+If `--target-ratio` absent, ask in user's language:
+> "얼마나 줄일까요? 예: '절반' / '핵심만 (5분 분량)' / '한 줄 TL;DR' / 혹은 비율 (0.05 ~ 0.5)"
+Map reply to a ratio (절반→0.5, 핵심→0.2, 한줄→0.05). No silent default.
+
 - `scripts/count-tokens.sh source` → source_tokens
 - target_tokens = round(source_tokens * ratio)
 

@@ -1,13 +1,19 @@
 ---
 name: distill
-description: Distill the essence from long text for a specific audience. Returns core claims + a loss diff. Requires --audience. Uses .harnish/.honne assets when present (silent skip otherwise).
+description: >
+  Distill the essence from long text for a specific audience. Returns core claims + a loss diff.
+  Asks for audience in natural language when --audience is not given. Uses .harnish/.honne assets
+  when present (silent skip otherwise).
+  Triggers: "distill", "핵심만", "추려", "요약해", "PR 본문", "TLDR", "tl;dr", "summarize", "essence".
 version: 0.0.1
 ---
 
 # galmuri:distill — 핵심 추리기
 
 ## Step 1: Audience Context
-1. Check `--audience` arg. If absent → run `scripts/query-assets.sh --tags audience --limit 3` → offer past audiences. If still absent → ask user. No defaults.
+1. Check `--audience` arg. If absent → run `scripts/query-assets.sh --tags audience --limit 3` → offer past audiences. If still absent, ask in user's language:
+   > "누구한테 보여줄 요약인가요? 예: 리뷰어, 팀 채널, 임원, 혹은 상황을 한 줄로 설명해주셔도 돼요."
+   Infer audience from the reply (freeform is fine). No silent defaults.
 2. Read `.harnish/persona.json` + `.honne/persona.json` if present (formality/verbosity only, §master.3.4).
 
 ## Step 1.5: Sibling Reflection

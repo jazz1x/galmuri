@@ -112,78 +112,82 @@ Hook entries added by `install-hooks.sh` remain in your `settings.json` — remo
 
 ## Quickstart
 
-Once installed, try the fastest path end-to-end:
+Just invoke the skill. It asks what it needs in plain language.
 
 ```
-# Inside a Claude Code session, in any project with a long doc or transcript
-/galmuri:distill
-```
-
-Sample flow (simplified):
-
-```
-user   > /galmuri:distill docs/meeting-2026-04-20.md --audience exec
-
-step 1 > Audience: exec (from --audience)
-step 2 > Source captured → .galmuri/tmp/source-meeting-2026-04-20.txt
-step 3 > Extracting claims (tone/examples/elaboration removed)…
-step 4 > evidence-check: structure ✓  ·  LLM-as-judge: 4/4 claims grounded
-step 5 > Loss diff: top 3 dropped items listed
-step 6 > Save to docs/galmuri-meeting-2026-04-20.md? (y / n / edit-slug)
+user   > /galmuri:distill
+galmuri > 누구한테 보여줄 요약인가요? 예: 리뷰어, 팀 채널, 임원, 혹은 상황을 한 줄로 설명해주셔도 돼요.
+user   > 리뷰어한테 PR 설명용
+galmuri > 원문은? (파일 경로 / 붙여넣기 / git diff)
+user   > git diff main...HEAD
+galmuri > [추출 → 검증 → 손실 diff]
+          Save to docs/galmuri-pr-summary.md? (y / n / edit-slug)
 user   > y
-
-✓ Saved: docs/galmuri-meeting-2026-04-20.md
-✓ Asset recorded: .galmuri/assets/summary.jsonl
+✓ Saved · asset recorded in .galmuri/assets/summary.jsonl
 ```
 
-If `--audience` is omitted, galmuri first offers recent audiences from `.galmuri/assets/` (via `scripts/query-assets.sh`), then asks explicitly — no silent default.
-
-Then compress further or turn a decision into a deck:
+Same pattern for the others — bare invocation opens a conversation, no flag memorization:
 
 ```
-/galmuri:shrink --target-ratio 0.2 --audience exec
-/galmuri:decide
+/galmuri:shrink   → "얼마나 줄일까요? (절반 / 핵심 / 한 줄 / 직접 비율)"
+/galmuri:decide   → "어떤 결정을 고민 중이세요? 한 줄로"
 ```
+
+Power users can skip the questions by passing args directly — see [Usage](#usage).
 
 ## Usage
 
 ### 1. Distill (essence extraction)
 
+Conversational (default):
 ```
-User: /galmuri:distill
-→ "Who is the audience? (engineer / exec / 5-year-old / free text)"
+/galmuri:distill
+→ "누구한테 보여줄 요약인가요? 예: 리뷰어, 팀 채널, 임원…"
+→ user replies in any form — audience is inferred
+→ source prompt → distill → verify → loss diff → HITL save
+```
 
-User: "engineer, 5-min standup"
-→ Reads source → LLM distills to claims only → LLM-as-judge verifies each claim against source
-→ Emits markdown: core essence + "## Loss bullets" (top 3~5 dropped items, prioritized)
-→ HITL: "Save to docs/galmuri-{slug}.md? (y / n / edit-slug)"
+With flags (skip the question):
+```
+/galmuri:distill path/to/source.md --audience exec
 ```
 
 ### 2. Shrink (target-ratio compression)
 
+Conversational (default):
 ```
-User: /galmuri:shrink --target-ratio 0.2 --audience exec
-→ Counts source tokens → compress to source_tokens × 0.2
-→ Up to 2 retries if |actual - target| > 5%
-→ On miss: [a]ccept current / [r]e-target / [c]ancel
-→ Emits compressed markdown with token comparison report
-→ Optional --show-loss for sentence-level diff
+/galmuri:shrink
+→ "얼마나 줄일까요? 예: '절반' / '핵심만 (5분)' / '한 줄 TL;DR' / 비율 (0.05~0.5)"
+→ reply mapped to ratio (절반→0.5, 핵심→0.2, 한줄→0.05)
+→ source prompt → compress (max 2 retries if |actual-target|>5%) → HITL save
+→ on ratio miss: [a]ccept / [r]e-target / [c]ancel
+```
+
+With flags:
+```
+/galmuri:shrink path/to/source.md --target-ratio 0.2 --audience exec [--show-loss]
 ```
 
 ### 3. Decide (decision deck template)
 
+Conversational (default):
 ```
-User: /galmuri:decide
+/galmuri:decide
+→ "어떤 결정을 고민 중이세요? 한 줄로 — 예: 'Postgres 로 갈지 SQLite 유지할지'"
 → 5-step protocol: Phenomenon → Decomposition (D/E/V/R) → Essence → Generalization → Reconstruction
-→ Strict mode requires Decision/Execution/Validation/Recovery on distinct subjects
-→ Small teams: /galmuri:decide --weak-decomposition (perspective separation on same subject)
+→ Strict mode requires D/E/V/R on distinct subjects
+```
+
+With flags:
+```
+/galmuri:decide "Postgres vs SQLite 마이그레이션" --weak-decomposition
+```
 
 Output: 2 template files (no binary build)
-  - {slug}.json  — slide copy + design_intent (Jobs tokens)
-  - {slug}.md    — presentation script + 18 Socratic probe questions (Definition × Difference × Attribution)
+- `{slug}.json` — slide copy + design_intent (Jobs tokens)
+- `{slug}.md` — presentation script + 18 Socratic probe questions (Definition × Difference × Attribution)
 
 Consumers render via Keynote / PowerPoint / Figma / Slidev / Marp.
-```
 
 ## Contributing
 
@@ -209,7 +213,7 @@ galmuri ships recommended hooks in `hooks/recommended.json`. `scripts/install-ho
 |-------|---------|--------------|
 | `PreToolUse` | Write to `docs/galmuri-*.md` | Runs `evidence-check.sh` structure gate before save |
 | `PostToolUse` | Write/Edit of galmuri outputs | Records the output as an asset in `.galmuri/assets/` |
-| `UserPromptSubmit` | Prompt matches `갈무리 \| galmuri \| tldr \| 핵심만 \| 추려서` | Injects a hint suggesting the relevant skill |
+| `UserPromptSubmit` | Prompt matches any skill's trigger phrase (e.g. `핵심만`, `압축`, `결정`) | Injects a hint routed to the specific skill (distill/shrink/decide) |
 | `SessionStart` | Session begins | Injects recent audience context from past assets |
 
 Hooks are opt-in — all skills work without them.
