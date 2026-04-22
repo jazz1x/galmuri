@@ -3,7 +3,7 @@ name: deck
 description: >
   덱 생성 어댑터. preset 선택 필수. SlideSpec JSON + 발표 스크립트 markdown 2파일 출력. 바이너리 빌드 없음.
   Triggers: "덱", "슬라이드", "deck", "발표 자료", "decide", "의사결정", "A vs B", "결정해", "뭐가 나아"
-version: 0.1.0
+version: 0.0.1
 ---
 
 # galmuri:deck — 덱 생성 어댑터

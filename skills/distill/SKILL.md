@@ -3,7 +3,7 @@ name: distill
 description: >
   Core engine. 본질환원 + 제1원칙 + 소크라테스 검증. 어댑터가 호출하거나 직접 호출 가능. 저장 없음 (어댑터 책임).
   Triggers: "distill", "핵심만", "본질", "distill engine"
-version: 0.1.0
+version: 0.0.1
 ---
 
 # galmuri:distill — Core Engine

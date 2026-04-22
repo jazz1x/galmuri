@@ -3,7 +3,7 @@ name: doc
 description: >
   문서형 정리 어댑터. distill 엔진을 호출하여 markdown 정리 후 파일로 남김. 기존 distill 저장 플로우 계승.
   Triggers: "문서로", "정리해서 저장", "doc", "기록으로", "shrink", "줄여줘", "압축"
-version: 0.1.0
+version: 0.0.1
 ---
 
 # galmuri:doc — 문서형 정리

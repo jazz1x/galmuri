@@ -7,11 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-(Future versions planned. Scope TBD based on user feedback.)
-
----
-
-## [0.1.0] — 2026-04-23
+Engine/adapter refactor (tracked under 0.0.1 development, not yet versioned as a release).
 
 ### Added
 
@@ -42,8 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **distill/references/prompt.md**: Merged compression tactics from shrink (복문→단문, 추상화, 고유명사·수치·인용, 시간 순서, 목차·메타 서술 금지). Added 본질환원/제1원칙/소크라테스 method sections.
 
 - **Hooks** (`hooks/recommended.json`): Updated to per-skill matchers for all five skills. Removed `decide` and `shrink` hook entries.
-
-- **Plugin version** bumped from `0.0.1` to `0.1.0`.
 
 ### Deprecated
 

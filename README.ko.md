@@ -2,7 +2,7 @@
 
 > Claude Code 플러그인 — 맥락을 모으고, 정리하고, 갈무리한다
 
-![version](https://img.shields.io/badge/version-0.1.0-blue)
+![version](https://img.shields.io/badge/version-0.0.1-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
 
@@ -59,7 +59,7 @@ Claude Code 세션 안에서 실행:
 예상 출력:
 
 ```
-✓ Installed galmuri@0.1.0 — 5 skills registered (distill, explain, pitch, doc, deck)
+✓ Installed galmuri@0.0.1 — 5 skills registered (distill, explain, pitch, doc, deck)
 ```
 
 ### 3. 확인
