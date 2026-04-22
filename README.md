@@ -2,25 +2,13 @@
 
 > Claude Code plugin — gather, organize, and keep context
 
+![version](https://img.shields.io/badge/version-0.0.1-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
+![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
+
 **galmuri** (갈무리) — Korean for *"gathering, organizing, and storing with care."* Turns sprawling context into well-kept summaries with explicit loss transparency, evidence grounding, and a decision-deck template engine.
 
 [한국어](./README.ko.md)
-
-## Install
-
-Run Claude Code, then:
-
-```
-/plugin marketplace add https://github.com/jazz1x/galmuri.git
-/plugin install galmuri
-```
-
-Optional — register the recommended hooks (HITL merge into `.claude/settings.json`):
-
-```bash
-bash scripts/install-hooks.sh          # project-level (default)
-bash scripts/install-hooks.sh --user   # user-level
-```
 
 ## Skills
 
@@ -41,6 +29,120 @@ decide  ──→  docs/galmuri-decide-{slug}.json  (slide copy + design_intent)
              docs/galmuri-decide-{slug}.md   (presentation script + 18 Socratic notes)
 
      └── .galmuri/ (asset index: audience, summary, decision-deck, evidence-trace)
+```
+
+## Install
+
+### 1. Register the marketplace
+
+Inside a Claude Code session, run:
+
+```
+/plugin marketplace add https://github.com/jazz1x/galmuri.git
+```
+
+Expected output:
+
+```
+✓ Marketplace 'galmuri' added (1 plugin)
+```
+
+### 2. Install the plugin
+
+```
+/plugin install galmuri
+```
+
+Expected output:
+
+```
+✓ Installed galmuri@0.0.1 — 3 skills registered (distill, shrink, decide)
+```
+
+### 3. Verify
+
+```
+/plugin list
+```
+
+You should see `galmuri` in the list. If the three slash commands below autocomplete, you're good:
+
+```
+/galmuri:distill
+/galmuri:shrink
+/galmuri:decide
+```
+
+### 4. (Optional) Install hooks
+
+galmuri ships optional hooks that add evidence gates, asset recording, prompt hints, and session context injection. They are **opt-in** — all skills work without them.
+
+Project-level (recommended — scopes hooks to this repo only):
+
+```bash
+bash scripts/install-hooks.sh
+# writes → .claude/settings.json   (backup: .claude/settings.json.bak-<epoch>)
+```
+
+User-level (apply globally to every project):
+
+```bash
+bash scripts/install-hooks.sh --user
+# writes → ~/.claude/settings.json
+```
+
+Force-overwrite existing hook entries on conflict (skip HITL merge):
+
+```bash
+bash scripts/install-hooks.sh --force
+```
+
+See the [Hooks](#hooks) section for what each hook does.
+
+### 5. Uninstall
+
+```
+/plugin uninstall galmuri
+/plugin marketplace remove galmuri
+```
+
+Hook entries added by `install-hooks.sh` remain in your `settings.json` — remove them manually or restore from the `.bak-<epoch>` file.
+
+---
+
+## Quickstart
+
+Once installed, try the fastest path end-to-end:
+
+```
+# Inside a Claude Code session, in any project with a long doc or transcript
+/galmuri:distill
+```
+
+Sample flow (simplified):
+
+```
+user   > /galmuri:distill docs/meeting-2026-04-20.md --audience exec
+
+step 1 > Audience: exec (from --audience)
+step 2 > Source captured → .galmuri/tmp/source-meeting-2026-04-20.txt
+step 3 > Extracting claims (tone/examples/elaboration removed)…
+step 4 > evidence-check: structure ✓  ·  LLM-as-judge: 4/4 claims grounded
+step 5 > Loss diff: top 3 dropped items listed
+step 6 > Save to docs/galmuri-meeting-2026-04-20.md? (y / n / edit-slug)
+user   > y
+
+✓ Saved: docs/galmuri-meeting-2026-04-20.md
+✓ Asset recorded: .galmuri/assets/summary.jsonl
+```
+
+If `--audience` is omitted, galmuri first offers recent audiences from `.galmuri/assets/` (via `scripts/query-assets.sh`), then asks explicitly — no silent default.
+
+Then compress further or turn a decision into a deck:
+
+```
+/galmuri:shrink --target-ratio 0.2 --audience exec
+/galmuri:decide
 ```
 
 ## Usage
@@ -81,6 +183,14 @@ Output: 2 template files (no binary build)
   - {slug}.md    — presentation script + 18 Socratic probe questions (Definition × Difference × Attribution)
 
 Consumers render via Keynote / PowerPoint / Figma / Slidev / Marp.
+```
+
+## Contributing
+
+This repo ships a pre-commit guardrail at `.githooks/pre-commit` that blocks runtime artifacts, validates plugin JSON, and checks README heading parity between `README.md` and `README.ko.md`. Git does not auto-install repo hooks — enable once per clone:
+
+```bash
+git config core.hooksPath .githooks
 ```
 
 ## Hooks
@@ -185,7 +295,8 @@ harnish (make)  ──→  honne (know)  ──→  galmuri (keep)
 ```
 
 - [harnish](https://github.com/jazz1x/harnish) — autonomous implementation engine
-- [honne](https://github.com/jazz1x/honne) — self-reflection (under development)
+- [honne](https://github.com/jazz1x/honne) — evidence-backed self-reflection (6-axis persona)
+- [galmuri](https://github.com/jazz1x/galmuri) — summary · decision-deck · documentation (formerly *hanashi*)
 
 ## Footnote
 

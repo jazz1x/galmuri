@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+staged() { git diff --cached --name-only --diff-filter=ACM; }
+
+fail() { echo "pre-commit: $1" >&2; exit 1; }
+
+# 1. Block runtime artifacts
+while IFS= read -r f; do
+  case "$f" in
+    .claude/settings.json|.galmuri/*|.harnish/*|*.bak-*)
+      fail "runtime artifact staged: $f (add to .gitignore or unstage)"
+      ;;
+  esac
+done < <(staged)
+
+# 2. Validate plugin JSON
+for j in .claude-plugin/marketplace.json .claude-plugin/plugin.json; do
+  staged | grep -qx "$j" || continue
+  python3 -c "import json,sys; json.load(open('$j'))" \
+    || fail "invalid JSON: $j"
+done
+
+# 3. README i18n heading parity
+for base in README.md; do
+  staged | grep -qxE "${base}|${base%.md}.ko.md" || continue
+  [[ -x scripts/i18n-sync-check.sh ]] || continue
+  bash scripts/i18n-sync-check.sh "$base" \
+    || fail "README heading structure mismatch between $base and ${base%.md}.ko.md"
+done
+
+exit 0

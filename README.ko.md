@@ -2,25 +2,13 @@
 
 > Claude Code 플러그인 — 맥락을 모으고, 정리하고, 갈무리한다
 
+![version](https://img.shields.io/badge/version-0.0.1-blue)
+![license](https://img.shields.io/badge/license-MIT-green)
+![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
+
 **galmuri** (갈무리) — 한국어 순우리말로 *"잘 거두어 간수한다 / 일을 마무리한다"*. 흩어진 맥락을 손실 투명성·증거 근거·의사결정 덱 템플릿으로 갈무리한다.
 
 [English](./README.md)
-
-## Install
-
-Claude Code 실행 후:
-
-```
-/plugin marketplace add https://github.com/jazz1x/galmuri.git
-/plugin install galmuri
-```
-
-선택 — 권장 훅 등록 (`.claude/settings.json` 에 HITL 머지):
-
-```bash
-bash scripts/install-hooks.sh          # project-level (기본)
-bash scripts/install-hooks.sh --user   # user-level
-```
 
 ## Skills
 
@@ -41,6 +29,120 @@ decide  ──→  docs/galmuri-decide-{slug}.json  (슬라이드 카피 + desig
              docs/galmuri-decide-{slug}.md   (발표 스크립트 + 18 소크라테스 노트)
 
      └── .galmuri/ (자산 인덱스: audience, summary, decision-deck, evidence-trace)
+```
+
+## 설치
+
+### 1. 마켓플레이스 등록
+
+Claude Code 세션 안에서 실행:
+
+```
+/plugin marketplace add https://github.com/jazz1x/galmuri.git
+```
+
+예상 출력:
+
+```
+✓ Marketplace 'galmuri' added (1 plugin)
+```
+
+### 2. 플러그인 설치
+
+```
+/plugin install galmuri
+```
+
+예상 출력:
+
+```
+✓ Installed galmuri@0.0.1 — 3 skills registered (distill, shrink, decide)
+```
+
+### 3. 확인
+
+```
+/plugin list
+```
+
+목록에 `galmuri` 가 보이면 성공. 아래 슬래시 명령이 자동완성되면 정상:
+
+```
+/galmuri:distill
+/galmuri:shrink
+/galmuri:decide
+```
+
+### 4. (선택) 훅 설치
+
+galmuri 는 선택적 훅을 제공한다 — 증거 게이트, 자산 기록, 프롬프트 힌트, 세션 컨텍스트 주입. 훅 없이도 모든 스킬은 동작한다.
+
+프로젝트 범위 (권장 — 해당 레포에만 적용):
+
+```bash
+bash scripts/install-hooks.sh
+# → .claude/settings.json 에 병합 (백업: .claude/settings.json.bak-<epoch>)
+```
+
+유저 범위 (모든 프로젝트에 전역 적용):
+
+```bash
+bash scripts/install-hooks.sh --user
+# → ~/.claude/settings.json 에 병합
+```
+
+충돌 시 기존 훅 항목 강제 덮어쓰기 (HITL 생략):
+
+```bash
+bash scripts/install-hooks.sh --force
+```
+
+각 훅의 역할은 아래 [Hooks](#hooks) 섹션 참고.
+
+### 5. 제거
+
+```
+/plugin uninstall galmuri
+/plugin marketplace remove galmuri
+```
+
+`install-hooks.sh` 로 추가된 훅 항목은 `settings.json` 에 그대로 남는다 — 수동 삭제하거나 `.bak-<epoch>` 파일로 복원.
+
+---
+
+## 빠른 시작
+
+설치 후 가장 빠른 end-to-end 경로:
+
+```
+# Claude Code 세션 안, 긴 문서나 트랜스크립트가 있는 프로젝트에서
+/galmuri:distill
+```
+
+예시 흐름 (단순화):
+
+```
+user   > /galmuri:distill docs/meeting-2026-04-20.md --audience exec
+
+step 1 > 청자: exec (--audience 에서 확정)
+step 2 > 소스 캡처 → .galmuri/tmp/source-meeting-2026-04-20.txt
+step 3 > 주장 추출 (톤/예시/부연 제거)…
+step 4 > evidence-check: 구조 ✓  ·  LLM-as-judge: 4/4 주장 grounded
+step 5 > Loss diff: 탈락 상위 3 출력
+step 6 > docs/galmuri-meeting-2026-04-20.md 에 저장? (y / n / edit-slug)
+user   > y
+
+✓ 저장됨: docs/galmuri-meeting-2026-04-20.md
+✓ 자산 기록: .galmuri/assets/summary.jsonl
+```
+
+`--audience` 가 없으면 galmuri 는 `.galmuri/assets/` 에서 최근 청자를 먼저 제안하고 (`scripts/query-assets.sh` 경유), 그래도 없으면 명시적으로 묻는다 — 묵시적 기본값 없음.
+
+이후 추가 압축 / 결정 덱으로 이어가기:
+
+```
+/galmuri:shrink --target-ratio 0.2 --audience exec
+/galmuri:decide
 ```
 
 ## Usage
@@ -81,6 +183,14 @@ User: /galmuri:decide
   - {slug}.md    — 발표 스크립트 + 18 소크라테스 probe (Definition × Difference × Attribution)
 
 Consumer 가 Keynote / PowerPoint / Figma / Slidev / Marp 로 렌더.
+```
+
+## Contributing
+
+이 레포는 `.githooks/pre-commit` 에 가드레일 훅을 둔다 — 런타임 산출물 차단, 플러그인 JSON 검증, `README.md` ↔ `README.ko.md` 헤딩 동기화 확인. Git 은 레포 훅을 자동 설치하지 않으므로 클론당 한 번 활성화:
+
+```bash
+git config core.hooksPath .githooks
 ```
 
 ## Hooks
@@ -185,7 +295,8 @@ harnish (make)  ──→  honne (know)  ──→  galmuri (keep)
 ```
 
 - [harnish](https://github.com/jazz1x/harnish) — 자율 구현 엔진
-- [honne](https://github.com/jazz1x/honne) — 자기 성찰 (개발 중)
+- [honne](https://github.com/jazz1x/honne) — 증거 기반 자기 성찰 (6축 persona)
+- [galmuri](https://github.com/jazz1x/galmuri) — 요약 · 의사결정 덱 · 문서화 (구 *hanashi*)
 
 ## Footnote
 

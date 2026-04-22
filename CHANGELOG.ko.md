@@ -5,7 +5,7 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 를 따릅니다.
 버전 관리는 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) 을 준수합니다.
 
-## [0.1.0] — 2026-04-22
+## [0.0.1] — 2026-04-22
 
 ### 추가
 
