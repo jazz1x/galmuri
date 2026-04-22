@@ -1,5 +1,5 @@
 ---
-name: galmuri:distill
+name: distill
 description: Distill the essence from long text for a specific audience. Returns core claims + a loss diff. Requires --audience. Uses .harnish/.honne assets when present (silent skip otherwise).
 version: 0.0.1
 ---

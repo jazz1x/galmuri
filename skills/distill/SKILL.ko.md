@@ -1,5 +1,5 @@
 ---
-name: galmuri:distill
+name: distill
 description: 긴 텍스트에서 특정 청자 대상의 본질을 추려낸다. 핵심 주장 + 손실 diff 반환. --audience 필수. .harnish/.honne 자산 존재 시 활용 (미존재 시 자동 skip).
 version: 0.0.1
 ---

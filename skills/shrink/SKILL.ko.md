@@ -1,5 +1,5 @@
 ---
-name: galmuri:shrink
+name: shrink
 description: 특정 청자 대상으로 텍스트를 목표 token 비율로 압축. --audience 와 --target-ratio (0.1~0.5) 필수. 최대 2회 재시도; 실패 시 사용자 질문.
 version: 0.0.1
 ---
