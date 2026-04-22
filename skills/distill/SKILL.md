@@ -6,6 +6,24 @@ version: 0.0.1
 
 # galmuri:distill — 핵심 추리기
 
+## Step 0: Intent Onramp (bare invocation only)
+Trigger when user calls `/galmuri:distill` with **no args** (no file, no `--audience`). Skip entirely if any arg is present.
+
+Ask:
+> "무엇을 추리시겠어요?
+>   1) PR 본문 — 변경 포인트만 추려서 리뷰어용
+>   2) 회의록·스레드 — 결정과 액션만 남기고 대화 걷어내기
+>   3) 긴 문서 본질 — 특정 청자용으로 주장만
+>   4) 자유 — 직접 설명"
+
+Route:
+- `1` → audience=`reviewer`, source=ask "어느 diff/브랜치?" → prefer `git diff main...HEAD`
+- `2` → audience=`team`, source=ask "파일 경로 / 클립보드 / 붙여넣기"
+- `3` → fall through to Step 1 (ask audience + source normally)
+- `4` → ask "한 줄로 상황 설명" → infer audience from user's description, confirm `[a]ccept / [c]hange`
+
+After Step 0 resolves, continue from Step 2 (Source Capture). Step 1 audience gathering is already satisfied.
+
 ## Step 1: Audience Context
 1. Check `--audience` arg. If absent → run `scripts/query-assets.sh --tags audience --limit 3` → offer past audiences. If still absent → ask user. No defaults.
 2. Read `.harnish/persona.json` + `.honne/persona.json` if present (formality/verbosity only, §master.3.4).

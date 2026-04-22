@@ -6,6 +6,24 @@ version: 0.0.1
 
 # galmuri:distill — 핵심 추리기
 
+## Step 0: 진입 가이드 (bare invocation 에만 동작)
+`/galmuri:distill` 을 **아무 인자 없이** 호출한 경우에만 실행. 인자가 하나라도 있으면 건너뜀.
+
+질문:
+> "무엇을 추리시겠어요?
+>   1) PR 본문 — 변경 포인트만 추려서 리뷰어용
+>   2) 회의록·스레드 — 결정과 액션만 남기고 대화 걷어내기
+>   3) 긴 문서 본질 — 특정 청자용으로 주장만
+>   4) 자유 — 직접 설명"
+
+라우팅:
+- `1` → audience=`reviewer`, source=질문 "어느 diff/브랜치?" → 기본 `git diff main...HEAD`
+- `2` → audience=`team`, source=질문 "파일 경로 / 클립보드 / 붙여넣기"
+- `3` → Step 1 로 fall through (청자 + source 일반 질문)
+- `4` → "한 줄로 상황 설명" → 설명에서 audience 추론, `[a]ccept / [c]hange` 확인
+
+Step 0 해결 후 Step 2 (원본 캡처) 로 이어감. Step 1 의 청자 수집은 이미 완료된 상태.
+
 ## Step 1: 청자 문맥
 1. `--audience` 인자 확인. 미제공 시 → `scripts/query-assets.sh --tags audience --limit 3` 실행 → 과거 청자 제안. 여전히 미제공 시 → 사용자 질문. 기본값 없음.
 2. `.harnish/persona.json` + `.honne/persona.json` 있으면 읽기 (형식/장황함만, §master.3.4).

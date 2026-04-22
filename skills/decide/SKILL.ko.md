@@ -6,6 +6,22 @@ version: 0.0.1
 
 # galmuri:decide — 의사결정 덱
 
+## Step 0: 진입 가이드 (bare invocation 에만 동작)
+`/galmuri:decide` 을 **아무 인자 없이** 호출한 경우에만 실행. `--weak-decomposition` 이나 문제 진술이 이미 제공됐으면 건너뜀.
+
+질문:
+> "어떤 결정인가요?
+>   1) 기술 선택 — A vs B 라이브러리/아키텍처
+>   2) 제품 방향 — 기능 X 를 할까 말까
+>   3) 팀/프로세스 — 운영 방식 변경 여부
+>   4) 자유 — 직접 설명"
+
+라우팅: 1/2/3 은 Step 1 (현상) 의 기본 프레임을 해당 도메인으로 고정한 뒤 질문. 4 는 바로 Step 1.
+
+작은 팀/조직이면 여기서 `--weak-decomposition` 자동 제안 → `[a]ccept / [i]gnore`.
+
+Step 0 해결 후 Step 1 로 이어감.
+
 ## 선행조건
 - 없음. 외부 스킬/바이너리 의존 없음 (template-only output).
 

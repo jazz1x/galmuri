@@ -18,6 +18,21 @@
 | **shrink** | `/galmuri:shrink` | Compress to a target token ratio with retry loop and loss diff |
 | **decide** | `/galmuri:decide` | Turn 2-option decisions into a 6-slide Jobs-style template (JSON + markdown, no binary build) |
 
+## Scenarios — start from a real situation
+
+Don't memorize flags. Invoke the skill bare and it walks you through.
+
+| Situation | Just type | What happens |
+|---|---|---|
+| Writing a PR body — extract what changed | `/galmuri:distill` | Asks what you want (PR body? meeting notes?), grabs `git diff main...HEAD` |
+| Long thread / meeting log, want 5-min read | `/galmuri:shrink` | Asks target ratio (half / core / one-liner), walks source capture |
+| Deciding A vs B, want a decision deck | `/galmuri:decide` | Asks problem domain (tech / product / team), runs D/E/V/R |
+| Not sure which one | `/galmuri:distill` — it's the most general entry |
+
+Power users can skip the onramp by passing args directly (e.g. `/galmuri:shrink --target-ratio 0.2`). See [Usage](#usage) for all flags.
+
+## Orbits
+
 Each skill runs in an **independent orbit**, connected only through **shared artifacts (files)**.
 
 ```

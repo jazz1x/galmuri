@@ -18,6 +18,21 @@
 | **shrink** | `/galmuri:shrink` | 목표 토큰 비율로 압축 + 재시도 루프 + 손실 diff |
 | **decide** | `/galmuri:decide` | 2지선택 결정 → 6슬라이드 Jobs-style 템플릿 (JSON + markdown, 바이너리 빌드 없음) |
 
+## Scenarios — 실제 상황에서 시작하기
+
+플래그 외우지 말고, 그냥 스킬만 호출하면 HITL 이 물어본다.
+
+| 상황 | 그냥 입력 | 스킬 동작 |
+|---|---|---|
+| PR 본문 쓰는데 변경 포인트만 추리고 싶다 | `/galmuri:distill` | "뭘 추릴까요?" 물음 → PR 선택 시 `git diff main...HEAD` 자동 |
+| 긴 스레드·회의록을 5분 읽을 분량으로 | `/galmuri:shrink` | "얼마나 줄일까요?" (절반 / 핵심 / 한줄) → 원본 캡처 안내 |
+| A vs B 결정, 덱으로 정리 | `/galmuri:decide` | "어떤 결정?" (기술 / 제품 / 팀) → D/E/V/R 진행 |
+| 뭘 써야 할지 모르겠다 | `/galmuri:distill` 먼저 — 가장 범용 진입 |
+
+익숙해지면 플래그로 onramp 생략 가능 (예: `/galmuri:shrink --target-ratio 0.2`). 전체 플래그는 [Usage](#usage) 참조.
+
+## Orbits
+
 각 스킬은 **독립 궤도**에서 동작하며, 오직 **공유 아티팩트 (파일)** 로만 연결된다.
 
 ```
