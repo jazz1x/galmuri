@@ -5,6 +5,60 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 를 따릅니다.
 버전 관리는 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) 을 준수합니다.
 
+## [미출시]
+
+엔진/어댑터 재설계 (0.0.1 개발 단계 내 변경, 별도 버전 릴리스 미확정).
+
+### 추가
+
+- **엔진/어댑터 아키텍처**: `distill` 이 EngineOutput JSON 을 생성하는 공유 엔진으로 재정의. 4개 어댑터(`explain`, `pitch`, `doc`, `deck`)가 이를 소비.
+
+- **explain 어댑터**: 작성자용 인라인 markdown 요약. `audience=me` 자동 고정, 파일 생성 없음, 청자 질의 없음.
+
+- **pitch 어댑터**: 지정 청자를 위한 Hook-Core-CTA 3–5줄 구조.
+
+- **doc 어댑터**: 정제된 markdown → `docs/galmuri-doc-{slug}.md` 저장 (청자 선택 + 자산 기록).
+
+- **deck 어댑터**: Jobs-inspired 디자인 토큰 (SF Pro, 16:9, dark-light-dark 샌드위치 패턴) 기반 슬라이드 카피 (JSON + markdown). 이진 파일 생성 없음.
+
+- **4개 deck 프리셋**: `decision-sandwich-6` (6슬라이드 2지 결정), `pitch-deck` (3슬라이드), `concept-explain` (4–5슬라이드), `story-arc` (가변 내러티브).
+
+- **EngineOutput JSON 스키마** (`skills/distill/references/essence-schema.json`): `EssenceUnit` 과 최상위 필드 정의 JSON Schema draft-07.
+
+- **scripts/validate-essence.sh**: EngineOutput JSON 스키마 검증. 통과 시 exit 0, 실패 시 exit 1.
+
+- **scripts/preflight.sh**: 런타임 선결 조건(jq, bash, bats) 확인. 미설치 시 exit 3 + 메시지.
+
+- **Deprecation alias 라우팅**: `decide`/`shrink` 트리거 → 문맥 맞는 어댑터 라우팅. `.galmuri/tmp/.warned-{alias}` 세션당 1회 경고.
+
+### 변경
+
+- **distill 스킬** 순수 엔진으로 재작성: `--mode`, `--ratio`, `--audience`, `--weak-decomposition`, `--input` 플래그. EngineOutput JSON 출력; 저장/렌더 결정은 어댑터 담당.
+
+- **distill/references/prompt.md**: shrink 의 압축 전술 5건 머지 (복문→단문, 추상화, 고유명사·수치·인용, 시간 순서, 목차·메타 서술 금지). 본질환원/제1원칙/소크라테스 메서드 섹션 추가.
+
+- **Hooks** (`hooks/recommended.json`): 5개 스킬 개별 matcher 로 업데이트. `decide`/`shrink` 훅 항목 제거.
+
+### Deprecated
+
+- **shrink 스킬**: 트리거 (`shrink`, `줄여줘`, `압축`) → `explain` 또는 `doc` 라우팅. 0.2.0 에서 제거 예정.
+
+- **decide 스킬**: 트리거 (`decide`, `결정`) → `deck --preset decision-sandwich-6` 라우팅. 0.2.0 에서 제거 예정.
+
+### 제거
+
+- `skills/decide/` — 내용 전체를 `skills/deck/references/preset-decision-sandwich-6.md` + `design-tokens.md` 로 이관.
+
+- `skills/shrink/` — 압축 전술을 `skills/distill/references/prompt.md` 로 이관.
+
+### Breaking
+
+- **EngineOutput JSON 이 스킬 간 계약.** distill 의 raw markdown 출력을 소비하던 외부 통합은 `EngineOutput` 스키마로 전환 필요.
+
+- **`/galmuri:shrink` 와 `/galmuri:decide` 명령 제거.** `explain`, `doc`, `deck` 을 사용. 트리거 phrase alias 는 0.1.x 세션 라우팅용으로 유지.
+
+---
+
 ## [0.0.1] — 2026-04-22
 
 ### 추가
@@ -60,9 +114,3 @@
 - 스킬 내 커스텀 LLM 모델 선택
 - 분석/사용 대시보드
 - i18n 검증 CI 통합
-
----
-
-## [미출시]
-
-(향후 버전 계획. 사용자 피드백 기반 범위 확정.)
