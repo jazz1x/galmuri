@@ -6,7 +6,7 @@
     "name": "jazz1x",
     "url": "https://github.com/jazz1x"
   },
-  "homepage": "https://github.com/jazz1x/galmuri",
+  "repository": "https://github.com/jazz1x/galmuri",
   "license": "MIT",
   "keywords": ["summarize", "compress", "decision", "pptx", "documentation", "korean"],
   "skills": "./skills"
