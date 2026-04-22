@@ -1,5 +1,5 @@
 ---
-name: galmuri:shrink
+name: shrink
 description: Compress text to a target token ratio for a specific audience. Requires --audience and --target-ratio (0.1~0.5). Up to 2 retries; asks user on miss.
 version: 0.0.1
 ---
