@@ -187,11 +187,19 @@ Consumers render via Keynote / PowerPoint / Figma / Slidev / Marp.
 
 ## Contributing
 
-This repo ships a pre-commit guardrail at `.githooks/pre-commit` that blocks runtime artifacts, validates plugin JSON, and checks README heading parity between `README.md` and `README.ko.md`. Git does not auto-install repo hooks — enable once per clone:
+This repo ships a pre-commit guardrail at `.githooks/pre-commit` that blocks runtime artifacts, validates plugin JSON, checks README heading parity between `README.md` and `README.ko.md`, and runs the full `tests/` suite when `bats` is installed. Git does not auto-install repo hooks — enable once per clone:
 
 ```bash
 git config core.hooksPath .githooks
 ```
+
+Run tests directly:
+
+```bash
+bash tests/run.sh   # requires bats-core + python3
+```
+
+CI runs the same suite on ubuntu + macos via `.github/workflows/tests.yml`.
 
 ## Hooks
 

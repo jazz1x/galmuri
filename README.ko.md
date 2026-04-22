@@ -187,11 +187,19 @@ Consumer 가 Keynote / PowerPoint / Figma / Slidev / Marp 로 렌더.
 
 ## Contributing
 
-이 레포는 `.githooks/pre-commit` 에 가드레일 훅을 둔다 — 런타임 산출물 차단, 플러그인 JSON 검증, `README.md` ↔ `README.ko.md` 헤딩 동기화 확인. Git 은 레포 훅을 자동 설치하지 않으므로 클론당 한 번 활성화:
+이 레포는 `.githooks/pre-commit` 에 가드레일 훅을 둔다 — 런타임 산출물 차단, 플러그인 JSON 검증, `README.md` ↔ `README.ko.md` 헤딩 동기화 확인, `bats` 설치 시 `tests/` 전체 실행. Git 은 레포 훅을 자동 설치하지 않으므로 클론당 한 번 활성화:
 
 ```bash
 git config core.hooksPath .githooks
 ```
+
+테스트 직접 실행:
+
+```bash
+bash tests/run.sh   # bats-core + python3 필요
+```
+
+ubuntu + macos 에서 `.github/workflows/tests.yml` 로 동일 suite 가 CI 실행된다.
 
 ## Hooks
 
