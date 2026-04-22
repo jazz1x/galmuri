@@ -1,6 +1,6 @@
 ---
 name: decide
-description: Turns ambiguous 2-option decisions into a 6-slide Jobs-style template (JSON + markdown, no binary build) + Socratic validation. Strict D/E/V/R decomposition; use --weak-decomposition for small teams.
+description: Turns ambiguous 2-option decisions into a 6-slide Jobs-style template (JSON + markdown, no binary build) + Socratic validation. Asks for the decision in natural language when no problem statement is given. Strict D/E/V/R decomposition; use --weak-decomposition for small teams.
 version: 0.0.1
 ---
 
@@ -10,6 +10,9 @@ version: 0.0.1
 - 없음. 외부 스킬/바이너리 의존 없음 (template-only output).
 
 ## Step 1: Phenomenon (현상)
+- If no problem statement provided in args, ask in user's language:
+  > "어떤 결정을 고민 중이세요? 한 줄로 — 예: 'Postgres 로 갈지 SQLite 유지할지', '채용 공고 올릴지 말지'"
+  답변이 2선택 구조가 아니면 되묻기: "두 선택지를 A / B 형태로 알려주세요."
 - 한 줄 문제 진술 고정.
 - `.honne/recent-reflection.md` 있으면 관련성 체크 → 한 줄 힌트 주입.
 

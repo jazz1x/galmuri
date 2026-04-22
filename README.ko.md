@@ -112,78 +112,82 @@ bash scripts/install-hooks.sh --force
 
 ## 빠른 시작
 
-설치 후 가장 빠른 end-to-end 경로:
+스킬만 호출하세요. 필요한 건 자연어로 물어봅니다.
 
 ```
-# Claude Code 세션 안, 긴 문서나 트랜스크립트가 있는 프로젝트에서
-/galmuri:distill
-```
-
-예시 흐름 (단순화):
-
-```
-user   > /galmuri:distill docs/meeting-2026-04-20.md --audience exec
-
-step 1 > 청자: exec (--audience 에서 확정)
-step 2 > 소스 캡처 → .galmuri/tmp/source-meeting-2026-04-20.txt
-step 3 > 주장 추출 (톤/예시/부연 제거)…
-step 4 > evidence-check: 구조 ✓  ·  LLM-as-judge: 4/4 주장 grounded
-step 5 > Loss diff: 탈락 상위 3 출력
-step 6 > docs/galmuri-meeting-2026-04-20.md 에 저장? (y / n / edit-slug)
+user   > /galmuri:distill
+galmuri > 누구한테 보여줄 요약인가요? 예: 리뷰어, 팀 채널, 임원, 혹은 상황을 한 줄로.
+user   > 리뷰어한테 PR 설명용
+galmuri > 원문은? (파일 경로 / 붙여넣기 / git diff)
+user   > git diff main...HEAD
+galmuri > [추출 → 검증 → 손실 diff]
+          docs/galmuri-pr-summary.md 에 저장? (y / n / edit-slug)
 user   > y
-
-✓ 저장됨: docs/galmuri-meeting-2026-04-20.md
-✓ 자산 기록: .galmuri/assets/summary.jsonl
+✓ 저장됨 · 자산 기록 .galmuri/assets/summary.jsonl
 ```
 
-`--audience` 가 없으면 galmuri 는 `.galmuri/assets/` 에서 최근 청자를 먼저 제안하고 (`scripts/query-assets.sh` 경유), 그래도 없으면 명시적으로 묻는다 — 묵시적 기본값 없음.
-
-이후 추가 압축 / 결정 덱으로 이어가기:
+다른 스킬도 동일 — 플래그 외울 필요 없음:
 
 ```
-/galmuri:shrink --target-ratio 0.2 --audience exec
-/galmuri:decide
+/galmuri:shrink   → "얼마나 줄일까요? (절반 / 핵심 / 한 줄 / 직접 비율)"
+/galmuri:decide   → "어떤 결정을 고민 중이세요? 한 줄로"
 ```
+
+익숙해지면 플래그로 질문 skip 가능 — [Usage](#usage) 참조.
 
 ## Usage
 
 ### 1. Distill (본질 추출)
 
+대화형 (기본):
 ```
-User: /galmuri:distill
-→ "청자는 누구입니까? (engineer / exec / 5-year-old / 자유 입력)"
+/galmuri:distill
+→ "누구한테 보여줄 요약인가요? 예: 리뷰어, 팀 채널, 임원…"
+→ 자유 답변 → 청자 추론
+→ 원문 질문 → 추출 → 검증 → 손실 diff → HITL 저장
+```
 
-User: "engineer, 5분 standup"
-→ 원문 로드 → LLM 이 주장만 남기도록 추출 → LLM-as-judge 각 주장의 원문 근거 검증
-→ markdown 출력: 본질 + "## 손실 bullet" (상위 3~5개, 우선순위대로)
-→ HITL: "docs/galmuri-{slug}.md 에 저장할까요? (y / n / edit-slug)"
+플래그 (질문 skip):
+```
+/galmuri:distill path/to/source.md --audience exec
 ```
 
 ### 2. Shrink (목표 비율 압축)
 
+대화형 (기본):
 ```
-User: /galmuri:shrink --target-ratio 0.2 --audience exec
-→ 원문 토큰 수 측정 → source_tokens × 0.2 로 압축
-→ |actual - target| > 5% 면 최대 2회 재시도
-→ 미달 시: [a]ccept 현 비율 / [r]e-target 재지정 / [c]ancel
-→ 압축 markdown + 토큰 비교 리포트 출력
-→ 선택 --show-loss 시 문장 단위 diff
+/galmuri:shrink
+→ "얼마나 줄일까요? 예: '절반' / '핵심만 (5분)' / '한 줄 TL;DR' / 비율 (0.05~0.5)"
+→ 답변을 비율로 매핑 (절반→0.5, 핵심→0.2, 한줄→0.05)
+→ 원문 질문 → 압축 (|actual-target|>5% 시 최대 2회 재시도) → HITL 저장
+→ 비율 미달: [a]ccept / [r]e-target / [c]ancel
+```
+
+플래그:
+```
+/galmuri:shrink path/to/source.md --target-ratio 0.2 --audience exec [--show-loss]
 ```
 
 ### 3. Decide (의사결정 덱 템플릿)
 
+대화형 (기본):
 ```
-User: /galmuri:decide
-→ 5단계 프로토콜: Phenomenon → Decomposition (D/E/V/R) → Essence → Generalization → Reconstruction
+/galmuri:decide
+→ "어떤 결정을 고민 중이세요? 한 줄로 — 예: 'Postgres 로 갈지 SQLite 유지할지'"
+→ 5단계 프로토콜: 현상 → 분해 (D/E/V/R) → 본질 → 일반화 → 재구성
 → strict 모드는 D/E/V/R 이 서로 다른 주체여야 함
-→ 소규모 팀: /galmuri:decide --weak-decomposition (동일 주체의 관점 분리)
+```
+
+플래그:
+```
+/galmuri:decide "Postgres vs SQLite 마이그레이션" --weak-decomposition
+```
 
 출력: 2 템플릿 파일 (바이너리 빌드 없음)
-  - {slug}.json  — 슬라이드 카피 + design_intent (Jobs 토큰)
-  - {slug}.md    — 발표 스크립트 + 18 소크라테스 probe (Definition × Difference × Attribution)
+- `{slug}.json` — 슬라이드 카피 + design_intent (Jobs 토큰)
+- `{slug}.md` — 발표 스크립트 + 18 소크라테스 probe (Definition × Difference × Attribution)
 
 Consumer 가 Keynote / PowerPoint / Figma / Slidev / Marp 로 렌더.
-```
 
 ## Contributing
 

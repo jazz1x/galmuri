@@ -1,13 +1,15 @@
 ---
 name: distill
-description: 긴 텍스트에서 특정 청자 대상의 본질을 추려낸다. 핵심 주장 + 손실 diff 반환. --audience 필수. .harnish/.honne 자산 존재 시 활용 (미존재 시 자동 skip).
+description: 긴 텍스트에서 특정 청자 대상의 본질을 추려낸다. 핵심 주장 + 손실 diff 반환. --audience 미제공 시 자연어로 물어본다. .harnish/.honne 자산 존재 시 활용 (미존재 시 자동 skip).
 version: 0.0.1
 ---
 
 # galmuri:distill — 핵심 추리기
 
 ## Step 1: 청자 문맥
-1. `--audience` 인자 확인. 미제공 시 → `scripts/query-assets.sh --tags audience --limit 3` 실행 → 과거 청자 제안. 여전히 미제공 시 → 사용자 질문. 기본값 없음.
+1. `--audience` 인자 확인. 미제공 시 → `scripts/query-assets.sh --tags audience --limit 3` 실행 → 과거 청자 제안. 여전히 미제공 시 사용자 언어로 질문:
+   > "누구한테 보여줄 요약인가요? 예: 리뷰어, 팀 채널, 임원, 혹은 상황을 한 줄로 설명해주셔도 돼요."
+   답변에서 청자 추론 (자유 서술 OK). 묵시적 기본값 없음.
 2. `.harnish/persona.json` + `.honne/persona.json` 있으면 읽기 (형식/장황함만, §master.3.4).
 
 ## Step 1.5: 형제 반영

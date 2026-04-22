@@ -1,6 +1,6 @@
 ---
 name: shrink
-description: 특정 청자 대상으로 텍스트를 목표 token 비율로 압축. --audience 와 --target-ratio (0.1~0.5) 필수. 최대 2회 재시도; 실패 시 사용자 질문.
+description: 특정 청자 대상으로 텍스트를 목표 token 비율로 압축. --audience / --target-ratio 미제공 시 자연어로 물어본다 (유효 비율 0.05~0.5). 최대 2회 재시도; 실패 시 사용자 질문.
 version: 0.0.1
 ---
 
@@ -13,6 +13,10 @@ distill 과 동일.
 distill SKILL.ko.md 참조.
 
 ## Step 3: 목표 크기 결정
+`--target-ratio` 미제공 시 사용자 언어로 질문:
+> "얼마나 줄일까요? 예: '절반' / '핵심만 (5분 분량)' / '한 줄 TL;DR' / 혹은 비율 (0.05 ~ 0.5)"
+답변을 비율로 매핑 (절반→0.5, 핵심→0.2, 한줄→0.05). 묵시적 기본값 없음.
+
 - `scripts/count-tokens.sh source` → source_tokens
 - target_tokens = round(source_tokens * ratio)
 
