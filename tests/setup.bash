@@ -8,6 +8,8 @@
 
 set -euo pipefail
 
+bats_require_minimum_version 1.5.0
+
 _setup_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$_setup_dir/.." && pwd)"
 unset _setup_dir

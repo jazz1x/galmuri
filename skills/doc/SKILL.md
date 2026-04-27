@@ -48,7 +48,7 @@ fi
 파일 생성 후 PostToolUse 훅 또는 직접 호출:
 ```bash
 bash scripts/record-asset.sh --type doc --tags "doc,{slug}" \
-  --title "{slug}" --content "{file-path}" --base-dir "$(pwd)/.harnish"
+  --source-ref ".galmuri/tmp/source-{slug}.txt" --output "docs/galmuri-doc-{slug}.md"
 ```
 
 ## Output Schema

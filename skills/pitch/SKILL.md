@@ -20,7 +20,8 @@ if [ ! -f ".galmuri/tmp/.warned-shrink" ]; then
   echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
   touch ".galmuri/tmp/.warned-shrink"
 fi
-TOKEN_COUNT=$(bash scripts/count-tokens.sh "$INPUT_FILE")
+TOKEN_JSON=$(bash scripts/count-tokens.sh "$INPUT_FILE")
+TOKEN_COUNT=$(printf '%s' "$TOKEN_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['tokens'])")
 # 라우팅 규칙:
 # source_tokens ≥ 80 AND ratio ≤ 0.1 (또는 "한 줄/TL;DR") → pitch (여기서 수행)
 # source_tokens ≥ 80 AND ratio > 0.1 → doc 으로 재위임 안내

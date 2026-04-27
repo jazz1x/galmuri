@@ -4,49 +4,21 @@
       {
         "matcher": "Write",
         "hooks": [{ "type": "command", "command": "hooks/shims/pre-write.sh" }]
-      },
-      {
-        "matcher": "distill",
-        "hooks": [{ "type": "command", "command": "hooks/shims/source-capture.sh" }]
-      },
-      {
-        "matcher": "explain",
-        "hooks": [{ "type": "command", "command": "hooks/shims/source-capture.sh" }]
-      },
-      {
-        "matcher": "pitch",
-        "hooks": [{ "type": "command", "command": "hooks/shims/source-capture.sh" }]
-      },
-      {
-        "matcher": "doc",
-        "hooks": [{ "type": "command", "command": "hooks/shims/source-capture.sh" }]
-      },
-      {
-        "matcher": "deck",
-        "hooks": [{ "type": "command", "command": "hooks/shims/source-capture.sh" }]
       }
     ],
     "PostToolUse": [
       {
         "matcher": "Write|Edit",
-        "hooks": [{ "type": "command", "command": "hooks/shims/post-write.sh" }]
-      },
-      {
-        "matcher": "pitch",
-        "hooks": [{ "type": "command", "command": "hooks/shims/asset-record.sh" }]
-      },
-      {
-        "matcher": "doc",
-        "hooks": [{ "type": "command", "command": "hooks/shims/asset-record.sh" }]
-      },
-      {
-        "matcher": "deck",
-        "hooks": [{ "type": "command", "command": "hooks/shims/asset-record.sh" }]
+        "hooks": [
+          { "type": "command", "command": "hooks/shims/post-write.sh" },
+          { "type": "command", "command": "hooks/shims/asset-record.sh" }
+        ]
       }
     ],
-    "UserPromptSubmit": [{
-      "hooks": [{ "type": "command", "command": "hooks/shims/prompt-hint.sh" }]
-    }],
+    "UserPromptSubmit": [
+      {"hooks": [{ "type": "command", "command": "hooks/shims/prompt-hint.sh" }]},
+      {"hooks": [{ "type": "command", "command": "hooks/shims/source-capture.sh" }]}
+    ],
     "SessionStart": [{
       "hooks": [{ "type": "command", "command": "hooks/shims/session-start.sh" }]
     }]

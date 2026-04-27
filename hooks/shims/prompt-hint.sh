@@ -15,15 +15,15 @@ if echo "$PROMPT" | grep -qiE '(핵심만|추려|요약해|PR 본문|tldr|tl;dr|
   exit 0
 fi
 if echo "$PROMPT" | grep -qiE '(압축|줄여|분량|절반으로|shrink|compress|shorten|condense)'; then
-  emit "Consider galmuri:shrink — compress to a target ratio (절반 / 핵심 / 한 줄) with loss diff."
+  emit "Consider galmuri:explain (inline) or galmuri:doc (file) — compress to a target ratio with loss diff."
   exit 0
 fi
 if echo "$PROMPT" | grep -qiE '(결정|의사결정|A vs B|고를까|선택할까|decide|choose between)'; then
-  emit "Consider galmuri:decide — turn a 2-option decision into a 6-slide deck template."
+  emit "Consider galmuri:deck --preset decision-sandwich-6 — turn a 2-option decision into a 6-slide deck."
   exit 0
 fi
 
 # Generic fallback
 if echo "$PROMPT" | grep -qiE '(갈무리|galmuri|deck)'; then
-  emit "Consider galmuri skills: distill / shrink / decide."
+  emit "Consider galmuri skills: distill / explain / doc / pitch / deck."
 fi

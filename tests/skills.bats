@@ -15,6 +15,26 @@ load "$BATS_TEST_DIRNAME/setup.bash"
 
 # ── Structure: i18n parity ────────────────────────────────────────────────────
 
+@test "every skills/*/SKILL.md heading structure matches SKILL.ko.md" {
+  run python3 -c "
+import os, subprocess
+root = '$REPO_ROOT/skills'
+bad = []
+for name in sorted(os.listdir(root)):
+    en = os.path.join(root, name, 'SKILL.md')
+    ko = os.path.join(root, name, 'SKILL.ko.md')
+    if not (os.path.isfile(en) and os.path.isfile(ko)): continue
+    r = subprocess.run(
+        ['bash', '$REPO_ROOT/scripts/i18n-sync-check.sh', en],
+        capture_output=True, text=True
+    )
+    if r.returncode != 0:
+        bad.append(f'{name}: heading mismatch between SKILL.md and SKILL.ko.md')
+assert not bad, bad
+"
+  [ "$status" -eq 0 ]
+}
+
 @test "every skills/*/SKILL.md has a corresponding SKILL.ko.md" {
   run python3 -c "
 import os

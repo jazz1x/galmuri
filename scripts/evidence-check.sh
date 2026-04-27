@@ -18,7 +18,7 @@ else
 fi
 [[ -n "$OUT_CONTENT" ]] || { echo "output empty" >&2; exit 1; }
 SRC_SIZE=$(wc -c < "$SRC")
-OUT_SIZE=${#OUT_CONTENT}
+OUT_SIZE=$(printf '%s' "$OUT_CONTENT" | wc -c)
 if [[ "$OUT_SIZE" -gt "$SRC_SIZE" ]]; then
   if [[ "$REQUIRE_SMALLER" == "1" ]]; then
     echo "fail: output larger than source (shrink mode)" >&2

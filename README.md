@@ -237,12 +237,12 @@ CI runs the same suite on ubuntu + macos via `.github/workflows/tests.yml`.
 
 galmuri ships recommended hooks in `hooks/recommended.json`. `scripts/install-hooks.sh` merges them into `.claude/settings.json` with HITL conflict resolution.
 
-| Event | Trigger | What it does |
-|-------|---------|--------------|
-| `PreToolUse` | Any skill invocation | Captures source to `.galmuri/tmp/` |
-| `PostToolUse` | Write/Edit of galmuri outputs | Records the output as an asset in `.galmuri/` |
-| `UserPromptSubmit` | Prompt matches skill trigger phrases | Injects a hint routed to the matching adapter |
-| `SessionStart` | Session begins | Injects recent audience context from past assets |
+| Event | Matcher | Shim(s) | What it does |
+|-------|---------|---------|--------------|
+| `PreToolUse` | `Write` | `pre-write.sh` | Validates source evidence before writing a galmuri output file |
+| `PostToolUse` | `Write\|Edit` | `post-write.sh`, `asset-record.sh` | Records output as an asset; cleans source from `.galmuri/tmp/` |
+| `UserPromptSubmit` | — | `prompt-hint.sh`, `source-capture.sh` | Routes skill-trigger phrases to the matching adapter; captures user prompt to `.galmuri/tmp/` |
+| `SessionStart` | — | `session-start.sh` | Injects 3 most recent assets as session context |
 
 Hooks are opt-in — all skills work without them.
 
@@ -260,7 +260,7 @@ Every output is recorded in `.galmuri/*.jsonl` with metadata. Asset types:
 Query past assets:
 
 ```bash
-bash scripts/query-assets.sh --tags audience --limit 3 --format inject
+bash scripts/query-assets.sh --type doc --limit 5 --format inject
 ```
 
 `.galmuri/` is gitignored by default.
