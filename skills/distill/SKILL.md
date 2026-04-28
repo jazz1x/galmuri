@@ -38,7 +38,8 @@ rm -f ".galmuri/tmp/retry-count.${SLUG}"
 ## Step 2: Mode Selection [bash + HITL]
 
 ```bash
-TOKEN_COUNT=$(bash scripts/count-tokens.sh ".galmuri/tmp/source-${SLUG}.txt")
+TOKEN_JSON=$(bash scripts/count-tokens.sh ".galmuri/tmp/source-${SLUG}.txt")
+TOKEN_COUNT=$(printf '%s' "$TOKEN_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['tokens'])")
 if [ "$TOKEN_COUNT" -lt 80 ]; then
   echo "[distill] 짧은 입력 (${TOKEN_COUNT} tokens) → construct 모드 권장"
 else

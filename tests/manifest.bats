@@ -142,6 +142,63 @@ assert not bad, bad
   [ "$status" -eq 0 ]
 }
 
+@test "all hook shims referenced in recommended.json exist on disk" {
+  run python3 -c "
+import json, os
+rec = json.load(open('$REPO_ROOT/hooks/recommended.json'))
+missing = []
+for event, entries in rec.get('hooks', {}).items():
+    for entry in entries:
+        for hook in entry.get('hooks', []):
+            cmd = hook.get('command', '')
+            if cmd and not os.path.isfile(os.path.join('$REPO_ROOT', cmd)):
+                missing.append(cmd)
+assert not missing, f'missing hook shims: {missing}'
+"
+  [ "$status" -eq 0 ]
+}
+
+@test "PreToolUse and PostToolUse matchers in recommended.json are valid Claude Code tool names" {
+  # Claude Code tool matchers must be actual tool names (Bash, Write, Edit, etc.),
+  # not skill names. Skill-name matchers silently never fire.
+  run python3 -c "
+import json, re
+VALID_TOOLS = {
+    'Bash','Read','Write','Edit','MultiEdit','Glob','Grep','LS',
+    'WebFetch','WebSearch','TodoRead','TodoWrite',
+    'NotebookRead','NotebookEdit','Task',
+}
+rec = json.load(open('$REPO_ROOT/hooks/recommended.json'))
+bad = []
+for event in ('PreToolUse', 'PostToolUse'):
+    for entry in rec.get('hooks', {}).get(event, []):
+        m = entry.get('matcher', '')
+        # matchers may be pipe-separated (Write|Edit)
+        parts = [p.strip() for p in m.split('|') if p.strip()]
+        for p in parts:
+            if p and p not in VALID_TOOLS:
+                bad.append(f'{event} matcher {p!r} is not a valid Claude Code tool name')
+assert not bad, bad
+"
+  [ "$status" -eq 0 ]
+}
+
+@test "count-tokens.sh outputs JSON with integer tokens field" {
+  local tmp tok_json
+  tmp=$(mktemp)
+  echo "hello world this is a test" > "$tmp"
+  tok_json=$(bash "$REPO_ROOT/scripts/count-tokens.sh" "$tmp" 2>/dev/null)
+  rm -f "$tmp"
+  echo "$tok_json" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+assert isinstance(d['tokens'], int), f'tokens not int: {type(d[\"tokens\"]).__name__}'
+assert d['tokens'] > 0, 'tokens must be positive'
+assert 'chars' in d and 'lines' in d, 'missing chars or lines fields'
+"
+  [ "$?" -eq 0 ]
+}
+
 @test "every SKILL.md documents a natural-language fallback for missing args" {
   # Regression guard for the conversational-entry contract: when a user
   # invokes a skill bare, the skill must ask in plain language (not error

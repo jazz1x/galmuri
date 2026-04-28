@@ -7,7 +7,7 @@ case "$FILE" in
   docs/galmuri-*.md) ;;
   *) exit 0 ;;
 esac
-SLUG=$(basename "$FILE" .md | sed 's/^galmuri-//')
+SLUG=$(basename "$FILE" | sed 's/^galmuri-[a-z][a-z]*-//;s/\.[^.]*$//')
 SRC=".galmuri/tmp/source-${SLUG}.txt"
 [[ -r "$SRC" ]] || exit 0
 printf '%s' "$CONTENT" | scripts/evidence-check.sh --source "$SRC" --output -

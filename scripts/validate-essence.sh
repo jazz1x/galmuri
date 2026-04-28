@@ -32,6 +32,15 @@ if [[ "$mode" != "reduce" && "$mode" != "construct" ]]; then
   errors=$((errors + 1))
 fi
 
+# ratio bounds (0.05 – 0.5) — only when present
+if echo "$INPUT" | jq -e 'has("ratio")' >/dev/null 2>&1; then
+  ratio="$(echo "$INPUT" | jq '.ratio')"
+  if ! echo "$ratio" | python3 -c "import sys; v=float(sys.stdin.read()); assert 0.05 <= v <= 0.5" 2>/dev/null; then
+    echo "ratio $ratio out of range [0.05, 0.5]" >&2
+    errors=$((errors + 1))
+  fi
+fi
+
 # units array: validate each EssenceUnit
 unit_count="$(echo "$INPUT" | jq '.units | length')"
 for i in $(seq 0 $((unit_count - 1))); do

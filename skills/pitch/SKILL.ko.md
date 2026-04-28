@@ -20,7 +20,18 @@ if [ ! -f ".galmuri/tmp/.warned-shrink" ]; then
   echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
   touch ".galmuri/tmp/.warned-shrink"
 fi
-# source_tokens ≥ 80 AND ratio ≤ 0.1 → pitch 수행, 그 외 → 재위임 안내
+TOKEN_JSON=$(bash scripts/count-tokens.sh "$INPUT_FILE")
+TOKEN_COUNT=$(printf '%s' "$TOKEN_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['tokens'])")
+# 라우팅 규칙:
+# source_tokens ≥ 80 AND ratio ≤ 0.1 → pitch 수행
+# source_tokens ≥ 80 AND ratio > 0.1 → doc 으로 재위임
+# source_tokens < 80 → explain 으로 재위임
+if [ "$TOKEN_COUNT" -ge 80 ] && [ "$(echo "$RATIO <= 0.1" | bc)" = "1" ]; then
+  : # pitch 수행
+else
+  echo "[shrink] 이 입력은 doc 또는 explain 어댑터에 더 적합합니다. /doc 또는 /explain 으로 재호출해주세요." >&2
+  exit 0
+fi
 ```
 
 > "누구에게 보낼 메시지인가요? (예: 팀장, 고객, 슬랙 채널)"

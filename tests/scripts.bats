@@ -52,6 +52,30 @@ load "$BATS_TEST_DIRNAME/setup.bash"
   [ "$status" -eq 2 ]
 }
 
+@test "parse-ratio: 0.50 normalises to 0.5" {
+  run bash "$REPO_ROOT/scripts/parse-ratio.sh" "0.50"
+  [ "$status" -eq 0 ]
+  [ "$output" = "0.5" ]
+}
+
+@test "parse-ratio: 'core only' (with space) → 0.2" {
+  run bash "$REPO_ROOT/scripts/parse-ratio.sh" "core only"
+  [ "$status" -eq 0 ]
+  [ "$output" = "0.2" ]
+}
+
+@test "parse-ratio: 'one line' (with space) → 0.05" {
+  run bash "$REPO_ROOT/scripts/parse-ratio.sh" "one line"
+  [ "$status" -eq 0 ]
+  [ "$output" = "0.05" ]
+}
+
+@test "parse-ratio: 'tl;dr' → 0.05" {
+  run bash "$REPO_ROOT/scripts/parse-ratio.sh" "tl;dr"
+  [ "$status" -eq 0 ]
+  [ "$output" = "0.05" ]
+}
+
 # ── validate-essence.sh ─────────────────────────────────────────────────────
 
 @test "validate-essence: valid fixture exits 0" {
