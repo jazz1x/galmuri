@@ -9,18 +9,18 @@ version: 0.0.1
 # galmuri:distill — Core Engine
 
 ## Prerequisites
-- `scripts/preflight.sh` 통과 (jq, bats, bash 설치 필수).
-- `scripts/parse-ratio.sh`, `scripts/validate-essence.sh` 실행 가능.
+- `scripts/preflight.sh` passes (jq, bats, bash required).
+- `scripts/parse-ratio.sh` and `scripts/validate-essence.sh` are executable.
 
 ## Flags
 
 | Flag | Required | Description |
 |------|----------|-------------|
-| `--mode reduce\|construct` | Yes (직접 호출 시) | reduce = 본질 축소, construct = 구조 확장 |
-| `--ratio 0.05–0.5` | No (reduce 모드에서 사용) | 자연어 가능 — `parse-ratio.sh` 로 파싱 |
-| `--audience {target}` | No | 미지정 시 어댑터가 HITL 처리 |
-| `--weak-decomposition` | No | Weak D/E/V/R 분해 허용 |
-| `--input {path}` | No | stdin 대신 파일 경로 지정 |
+| `--mode reduce\|construct` | Yes (when called directly) | reduce = essence reduction, construct = structural expansion |
+| `--ratio 0.05–0.5` | No (used in reduce mode) | Natural-language values accepted — parsed by `parse-ratio.sh` |
+| `--audience {target}` | No | If omitted, the adapter handles it via HITL |
+| `--weak-decomposition` | No | Allow Weak D/E/V/R decomposition |
+| `--input {path}` | No | File path instead of stdin |
 
 ## Step 1: Input Capture [bash]
 
@@ -28,12 +28,12 @@ version: 0.0.1
 mkdir -p .galmuri/tmp
 SLUG=$(echo "$INPUT" | head -c 40 | tr -cs '[:alnum:]' '-' | tr '[:upper:]' '[:lower:]')
 cat > ".galmuri/tmp/source-${SLUG}.txt"
-# retry 카운터 초기화 (이전 세션 잔존 파일 정리)
+# reset retry counter (clean up leftovers from prior sessions)
 rm -f ".galmuri/tmp/retry-count.${SLUG}"
 ```
 
-- 소스 텍스트를 `.galmuri/tmp/source-{slug}.txt` 에 기록.
-- `--mode` 미지정 시 Step 2 로 진행. 지정 시 Step 2 skip → Step 3.
+- Persist source text to `.galmuri/tmp/source-{slug}.txt`.
+- If `--mode` is omitted, proceed to Step 2. If specified, skip Step 2 → Step 3.
 
 ## Step 2: Mode Selection [bash + HITL]
 
@@ -41,30 +41,30 @@ rm -f ".galmuri/tmp/retry-count.${SLUG}"
 TOKEN_JSON=$(bash scripts/count-tokens.sh ".galmuri/tmp/source-${SLUG}.txt")
 TOKEN_COUNT=$(printf '%s' "$TOKEN_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['tokens'])")
 if [ "$TOKEN_COUNT" -lt 80 ]; then
-  echo "[distill] 짧은 입력 (${TOKEN_COUNT} tokens) → construct 모드 권장"
+  echo "[distill] short input (${TOKEN_COUNT} tokens) → construct mode recommended"
 else
-  echo "[distill] 긴 입력 (${TOKEN_COUNT} tokens) → reduce 모드 권장"
+  echo "[distill] long input (${TOKEN_COUNT} tokens) → reduce mode recommended"
 fi
 ```
 
-- `--mode` 가 명시되어 있으면 이 Step skip.
-- 미지정 시 토큰 수 기준으로 모드 제안 → HITL confirm.
-  > "reduce 와 construct 중 어떤 모드로 진행할까요? 예: reduce (요약), construct (구조 확장)"
+- Skip this step when `--mode` is explicit.
+- Otherwise, suggest a mode based on token count → confirm with HITL.
+  > "Proceed with reduce or construct? e.g. reduce (summarize), construct (structural expansion)"
 
-## Step 3: 3 Methods 적용 [LLM]
+## Step 3: Apply the 3 Methods [LLM]
 
-`references/prompt.md` + `references/decomposition.md` + `references/socratic_probe.md` 지시를 순서대로 적용:
+Apply `references/prompt.md` + `references/decomposition.md` + `references/socratic_probe.md` in order:
 
-1. **Method 1 본질환원**: 각 claim → 주어-동사 한 줄 essence.
-2. **Method 2 제1원칙 분해**: D/E/V/R 4 질문 적용 (`--weak-decomposition` 시 Weak 모드).
-3. **Method 3 소크라테스 검증**: 3축 probe → 실패 unit 은 `dropped[]` 에 기록.
+1. **Method 1 — Essence reduction**: each claim → a one-line subject-verb essence.
+2. **Method 2 — First-principles decomposition**: apply the 4 D/E/V/R questions (Weak mode under `--weak-decomposition`).
+3. **Method 3 — Socratic validation**: 3-axis probe → failed units land in `dropped[]`.
 
-**Retry 명세 (결정론)**:
-- Step A: essence_units 후보 생성.
-- Step B: `bash scripts/validate-essence.sh` 로 스키마 검증.
-- Step C: reduce 모드 시 `|actual_ratio - target_ratio| > 0.05` 이면 재적용 (최대 2회).
+**Retry contract (deterministic)**:
+- Step A: produce candidate essence_units.
+- Step B: schema-check via `bash scripts/validate-essence.sh`.
+- Step C: in reduce mode, re-apply if `|actual_ratio - target_ratio| > 0.05` (max 2 retries).
 
-retry 카운터 관리 (bash):
+Retry counter management (bash):
 
 ```bash
 COUNT_FILE=".galmuri/tmp/retry-count.${SLUG}"
@@ -72,37 +72,37 @@ CURRENT=$(cat "$COUNT_FILE" 2>/dev/null || echo 0)
 echo $((CURRENT + 1)) > "$COUNT_FILE"
 ```
 
-2 초과 시 Step 5 의 HITL 분기로 이동.
+Past 2, fall through to the HITL branch in Step 5.
 
-## Step 4: Ratio Validation [bash] (reduce 모드만)
+## Step 4: Ratio Validation [bash] (reduce mode only)
 
 ```bash
 bash scripts/validate-essence.sh < output.json
 bash scripts/count-tokens.sh output.json
 ```
 
-- Step 3 LLM 루프 만료 후 최종 판정.
-- ratio 편차 > 0.05 지속 시 retry-count 확인 → 2 미만이면 Step 3 재진입, 2 이상이면 Step 5 HITL.
+- Final adjudication after the Step 3 LLM loop.
+- If ratio drift > 0.05 persists, check retry-count → re-enter Step 3 if < 2, else HITL in Step 5.
 
 ## Step 5: Output [bash]
 
 ```bash
 bash scripts/validate-essence.sh < final-output.json || {
-  echo "[distill] 검증 실패"
+  echo "[distill] validation failed"
   # HITL: [a]ccept / [r]e-target / [c]ancel
   exit 1
 }
 cat final-output.json
-# 카운터 정리
+# clear counter
 rm -f ".galmuri/tmp/retry-count.${SLUG}"
 ```
 
-- `validate-essence.sh` 최종 통과 강제 → EngineOutput JSON 출력.
-- 실패 시 exit 1 + HITL (`[a]ccept / [r]e-target / [c]ancel`).
-- 정상/HITL 어느 경로든 종료 직전 retry 카운터 파일 정리.
+- Final `validate-essence.sh` pass is mandatory → emit EngineOutput JSON.
+- On failure: exit 1 + HITL (`[a]ccept / [r]e-target / [c]ancel`).
+- On either branch (normal or HITL), clean up the retry counter file before exit.
 
 ## Output Schema
-EngineOutput JSON (`essence-schema.json` 준수):
+EngineOutput JSON (matches `essence-schema.json`):
 ```json
 {
   "units": [...],
@@ -112,4 +112,4 @@ EngineOutput JSON (`essence-schema.json` 준수):
   "source_ref": ".galmuri/tmp/source-{slug}.txt"
 }
 ```
-저장 없음. 어댑터가 EngineOutput 을 받아 저장 여부를 결정한다.
+No persistence here — the adapter receives EngineOutput and decides whether to persist.

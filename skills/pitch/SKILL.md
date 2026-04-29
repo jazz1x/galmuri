@@ -6,52 +6,52 @@ description: >
 version: 0.0.1
 ---
 
-# galmuri:pitch — 전달용 메시지
+# galmuri:pitch — Outbound message adapter
 
 ## Prerequisites
-- `scripts/preflight.sh` 통과.
-- `skills/distill/` 엔진 설치됨.
+- `scripts/preflight.sh` passes.
+- `skills/distill/` engine is installed.
 
-## Step 1: Alias 감지 + Audience (필수)
+## Step 1: Alias detection + Audience (required)
 
-`shrink` / `줄여줘` / `압축` 키워드로 진입 시 — 토큰 수 측정 후 라우팅:
+When triggered via `shrink` / `줄여줘` / `압축` — measure tokens, then route:
 ```bash
 if [ ! -f ".galmuri/tmp/.warned-shrink" ]; then
-  echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
+  echo "[deprecated] the 'shrink' trigger is routed to a context-based adapter. Scheduled for removal in a future release." >&2
   touch ".galmuri/tmp/.warned-shrink"
 fi
 TOKEN_JSON=$(bash scripts/count-tokens.sh "$INPUT_FILE")
 TOKEN_COUNT=$(printf '%s' "$TOKEN_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['tokens'])")
-# 라우팅 규칙:
-# source_tokens ≥ 80 AND ratio ≤ 0.1 (또는 "한 줄/TL;DR") → pitch (여기서 수행)
-# source_tokens ≥ 80 AND ratio > 0.1 → doc 으로 재위임 안내
-# source_tokens < 80 → explain 으로 재위임 안내
+# Routing rules:
+# source_tokens ≥ 80 AND ratio ≤ 0.1 (or "one line / TL;DR") → pitch (run here)
+# source_tokens ≥ 80 AND ratio > 0.1 → delegate to doc
+# source_tokens < 80 → delegate to explain
 if [ "$TOKEN_COUNT" -ge 80 ] && [ "$(echo "$RATIO <= 0.1" | bc)" = "1" ]; then
-  : # pitch 가 수행
+  : # pitch handles it
 else
-  echo "[shrink] 이 입력은 doc 또는 explain 어댑터에 더 적합합니다. /doc 또는 /explain 으로 재호출해주세요." >&2
+  echo "[shrink] this input fits the doc or explain adapter better. Re-invoke as /doc or /explain." >&2
   exit 0
 fi
 ```
 
-> "누구에게 보낼 메시지인가요? (예: 팀장, 고객, 슬랙 채널)"
-- audience 미지정 시 반드시 질의. 기본값 없음.
+> "Who is this message for? (e.g. team lead, customer, Slack channel)"
+- If audience is missing, you MUST ask. No default.
 
 ## Step 2: Engine Invoke
-- `distill --mode reduce --ratio 0.08 --audience {X}` 호출.
-- EngineOutput JSON 수신.
+- Call `distill --mode reduce --ratio 0.08 --audience {X}`.
+- Receive the EngineOutput JSON.
 
 ## Step 3: Render (Hook-Core-CTA)
-`references/prompt.md` 지시로 3~5줄 렌더:
-- **Hook (1줄)**: 청자의 현재 상황을 찌르는 질문 또는 반전. 30자 이내. 평서문 금지.
-- **Core (1~2줄)**: 단일 claim + 근거 1개. 각 줄 50자 이내. 나열형 금지 (1개 핵심만).
-- **CTA (1줄)**: 행동 또는 판단 요청. 명령형 또는 의문형. 30자 이내.
-- 전체 3~5줄.
+Render 3–5 lines per `references/prompt.md`:
+- **Hook (1 line)**: a question or reversal that pierces the recipient's current situation. ≤ 30 chars. No declaratives.
+- **Core (1–2 lines)**: a single claim + one piece of supporting evidence. ≤ 50 chars per line. No enumeration (one core point only).
+- **CTA (1 line)**: a request for action or judgment. Imperative or interrogative. ≤ 30 chars.
+- 3–5 lines total.
 
-## Step 4: 저장 HITL
+## Step 4: Save HITL
 > "Save to `docs/galmuri-pitch-{slug}.md`? (y/n/edit-slug)"
-- 기본값: prompt (자동 저장 없음, 자동 거부 없음).
-- `y` → 파일 생성. `n` → 출력만. `edit-slug` → 파일명 변경 후 생성.
+- Default: prompt (no auto-save, no auto-reject).
+- `y` → create file. `n` → stdout only. `edit-slug` → rename, then create.
 
 ## Output Schema
-3~5줄 plain text (Hook + Core + CTA) + optional saved file.
+3–5 lines of plain text (Hook + Core + CTA) + optional saved file.

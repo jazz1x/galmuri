@@ -7,44 +7,44 @@ description: >
 version: 0.0.1
 ---
 
-# galmuri:explain — 나 이해용 정리
+# galmuri:explain — Inline reader-side summary
 
 ## Prerequisites
-- `scripts/preflight.sh` 통과 (jq, bats, bash).
-- `skills/distill/` 엔진 설치됨.
+- `scripts/preflight.sh` passes (jq, bats, bash).
+- `skills/distill/` engine is installed.
 
-## Step 1: Alias 감지 + Input Capture
+## Step 1: Alias detection + Input Capture
 
-`shrink` / `줄여줘` / `압축` 키워드로 진입 시:
+When triggered via `shrink` / `줄여줘` / `압축`:
 ```bash
 if [ ! -f ".galmuri/tmp/.warned-shrink" ]; then
-  echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
+  echo "[deprecated] the 'shrink' trigger is routed to a context-based adapter. Scheduled for removal in a future release." >&2
   touch ".galmuri/tmp/.warned-shrink"
 fi
-# source_tokens < 80 → explain 수행, 그 외 → 재위임 안내
+# source_tokens < 80 → explain runs; otherwise → delegate to another adapter
 ```
 
-- 사용자 입력 (파일 경로 또는 stdin) 을 `.galmuri/tmp/source-{slug}.txt` 에 넣음.
-  입력 경로 없는 경우: "설명할 파일 경로나 텍스트를 알려주세요. 예: `README.md` — 무엇을 설명할까요?"
-- audience 는 `me` 자동 고정 (별도 질의 없음).
+- Pipe user input (a file path or stdin) into `.galmuri/tmp/source-{slug}.txt`.
+  If no path is provided: "Tell me a file path or some text to explain. e.g. `README.md` — what should I explain?"
+- audience is locked to `me` automatically (no separate prompt).
 
 ## Step 2: Engine Invoke
-> Claude Code skill 프레임워크에서 어댑터가 엔진을 호출하는 공식 경로는 **동일 세션 내 `distill` skill 을 Skill tool 로 호출** 하는 것.
-> 호출 시 전달 인자:
+> The official adapter→engine path under the Claude Code skill framework is to **call the `distill` skill via the Skill tool inside the same session**.
+> Arguments to pass:
 >   - `--mode reduce`
 >   - `--ratio 0.2`
 >   - `--audience me`
->   - `--input` = Step 1 의 tmp 파일 경로
-> 엔진 응답은 EngineOutput JSON 으로 반환받고 Step 3 이 이어 렌더.
+>   - `--input` = the tmp file path from Step 1
+> The engine returns an EngineOutput JSON; Step 3 picks it up and renders.
 
 ## Step 3: Render
 - EngineOutput.units → inline markdown:
-  - 첫 unit 의 `claim` 을 상단 요약으로.
-  - 각 unit 의 `essence` 를 bullet 로 나열.
+  - First unit's `claim` becomes the top-line summary.
+  - Each unit's `essence` is listed as a bullet.
 
 ## Step 4: Output
-- stdout 에 markdown 출력. **파일 생성 단계 없음** (설계 의도).
-- 세션 종료 시 `.galmuri/tmp/source-{slug}.txt` 자동 정리 (훅).
+- Emit markdown to stdout. **No file-generation step** (by design).
+- On session end, `.galmuri/tmp/source-{slug}.txt` is cleaned up automatically (hook).
 
 ## Output Schema
-markdown body only. JSON 출력 없음.
+Markdown body only. No JSON output.
