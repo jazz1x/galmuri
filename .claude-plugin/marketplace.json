@@ -5,7 +5,7 @@
   "plugins": [{
     "name": "galmuri",
     "source": "./",
-    "description": "흩어진 맥락을 갈무리한다. 요약·정리·퇴고·문서화·의사결정 덱을 위한 Claude Code 플러그인.",
+    "description": "Gather, organize, and keep scattered context. Claude Code plugin for summaries, refinement, documentation, and decision decks.",
     "version": "0.0.1",
     "tags": ["summarize", "decision-deck", "documentation", "i18n"]
   }]

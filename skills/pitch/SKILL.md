@@ -1,7 +1,7 @@
 ---
 name: pitch
 description: >
-  타인 전달용 3~5줄 메시지 어댑터. Hook-Core-CTA 구조. audience 필수 질의. 파일 선택 저장.
+  Three-to-five-line message adapter for sharing with others. Hook-Core-CTA structure. Audience query required. Optional file save.
   Triggers: "꽂아줘", "전달할 메시지", "pitch", "슬랙에 붙일", "DM 보낼", "shrink", "줄여줘", "압축"
 version: 0.0.1
 ---

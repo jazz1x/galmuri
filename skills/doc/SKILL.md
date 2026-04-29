@@ -1,7 +1,7 @@
 ---
 name: doc
 description: >
-  문서형 정리 어댑터. distill 엔진을 호출하여 markdown 정리 후 파일로 남김. 기존 distill 저장 플로우 계승.
+  Document adapter. Calls the distill engine, formats the result as markdown, and saves it to a file. Inherits the prior distill save flow.
   Triggers: "문서로", "정리해서 저장", "doc", "기록으로", "shrink", "줄여줘", "압축"
 version: 0.0.1
 ---
