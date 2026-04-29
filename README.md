@@ -42,6 +42,32 @@ galmuri is organized as **one engine + four adapters**:
 
 ## Install
 
+### skills.sh (recommended)
+
+Works with Claude Code, Cursor, Codex, Windsurf, and 40+ other agents.
+
+```bash
+npx skills add jazz1x/galmuri          # install into the current project (./.claude/skills/)
+npx skills add jazz1x/galmuri -g       # install globally (~/.claude/skills/)
+```
+
+Useful flags:
+
+```bash
+npx skills add jazz1x/galmuri --list             # preview skills before installing
+npx skills add jazz1x/galmuri --skill deck       # install a single skill only
+```
+
+Expected `--list` output:
+
+```
+distill
+explain
+pitch
+doc
+deck
+```
+
 ### 1. Register the marketplace
 
 Inside a Claude Code session, run:

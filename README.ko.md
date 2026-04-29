@@ -42,6 +42,32 @@ galmuri 는 **엔진 1개 + 어댑터 4개** 구조:
 
 ## 설치
 
+### skills.sh (권장)
+
+Claude Code, Cursor, Codex, Windsurf 등 40+ 에이전트에서 동작.
+
+```bash
+npx skills add jazz1x/galmuri          # 현재 프로젝트에 설치 (./.claude/skills/)
+npx skills add jazz1x/galmuri -g       # 전역 설치 (~/.claude/skills/)
+```
+
+자주 쓰는 플래그:
+
+```bash
+npx skills add jazz1x/galmuri --list             # 설치 전 스킬 목록 미리보기
+npx skills add jazz1x/galmuri --skill deck       # 단일 스킬만 설치
+```
+
+`--list` 예상 출력:
+
+```
+distill
+explain
+pitch
+doc
+deck
+```
+
 ### 1. 마켓플레이스 등록
 
 Claude Code 세션 안에서 실행:
