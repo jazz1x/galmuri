@@ -4,7 +4,7 @@ description: >
   나 이해용 inline 어댑터. distill 엔진을 호출하여 긴 텍스트의 본질을 뽑고 inline markdown 으로 렌더.
   audience=me 자동 고정. 출력만 하며 파일 생성 없음.
   Triggers: "설명해", "이해하게", "explain", "정리해서 보여줘", "readme 읽고", "shrink", "줄여줘", "압축"
-version: 0.0.1
+version: 0.0.2
 ---
 
 # galmuri:explain — 나 이해용 정리

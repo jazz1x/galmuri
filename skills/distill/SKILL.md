@@ -3,7 +3,7 @@ name: distill
 description: >
   Core engine. Essence reduction + first-principles decomposition + Socratic validation. Invoked by adapters or directly. No persistence (adapters own that).
   Triggers: "distill", "핵심만", "본질", "distill engine"
-version: 0.0.1
+version: 0.0.2
 ---
 
 # galmuri:distill — Core Engine

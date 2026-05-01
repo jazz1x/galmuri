@@ -3,7 +3,7 @@ name: doc
 description: >
   Document adapter. Calls the distill engine, formats the result as markdown, and saves it to a file. Inherits the prior distill save flow.
   Triggers: "문서로", "정리해서 저장", "doc", "기록으로", "shrink", "줄여줘", "압축"
-version: 0.0.1
+version: 0.0.2
 ---
 
 # galmuri:doc — Document adapter

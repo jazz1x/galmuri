@@ -3,7 +3,7 @@ name: deck
 description: >
   Deck generation adapter. Requires a preset selection. Emits two files — a SlideSpec JSON and a presentation script markdown. No binary build.
   Triggers: "덱", "슬라이드", "deck", "발표 자료", "decide", "의사결정", "A vs B", "결정해", "뭐가 나아"
-version: 0.0.1
+version: 0.0.2
 ---
 
 # galmuri:deck — Deck generation adapter

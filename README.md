@@ -2,7 +2,7 @@
 
 > Claude Code plugin — gather, organize, and keep context
 
-![version](https://img.shields.io/badge/version-0.0.1-blue)
+![version](https://img.shields.io/badge/version-0.0.2-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
 
@@ -85,7 +85,7 @@ Inside a Claude Code session, run:
 Expected output:
 
 ```
-✓ Installed galmuri@0.0.1 — 5 skills registered (distill, explain, pitch, doc, deck)
+✓ Installed galmuri@0.0.2 — 5 skills registered (distill, explain, pitch, doc, deck)
 ```
 
 ### 3. Verify
