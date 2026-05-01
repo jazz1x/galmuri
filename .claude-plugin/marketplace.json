@@ -6,7 +6,7 @@
     "name": "galmuri",
     "source": "./",
     "description": "Gather, organize, and keep scattered context. Claude Code plugin for summaries, refinement, documentation, and decision decks.",
-    "version": "0.0.1",
+    "version": "0.0.2",
     "tags": ["summarize", "decision-deck", "documentation", "i18n"]
   }]
 }

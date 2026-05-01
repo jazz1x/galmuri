@@ -134,3 +134,26 @@ assert not missing, f'missing presets: {missing}'
     "$REPO_ROOT/skills/deck/references/preset-decision-sandwich-6.md"
   [ "$status" -eq 0 ]
 }
+
+# ── explain adapter: Skill-tool delegation (not blockquote note) ─────────────
+
+@test "explain/SKILL.md Step 2 explicitly delegates via Skill tool" {
+  # The engine call must be a first-class instruction, not buried in a blockquote.
+  run grep -q 'Skill tool' "$REPO_ROOT/skills/explain/SKILL.md"
+  [ "$status" -eq 0 ]
+}
+
+# ── pitch adapter: prose routing (no bc float comparison) ────────────────────
+
+@test "pitch/SKILL.md Step 1 uses prose routing without bc" {
+  # bc float comparison is non-portable and doesn't execute in LLM context.
+  run bash -c "! grep -wq 'bc' '$REPO_ROOT/skills/pitch/SKILL.md'"
+  [ "$status" -eq 0 ]
+}
+
+# ── doc adapter: PostToolUse hook is automatic ────────────────────────────────
+
+@test "doc/SKILL.md Step 5 states PostToolUse hook runs automatically" {
+  run grep -q 'automatically' "$REPO_ROOT/skills/doc/SKILL.md"
+  [ "$status" -eq 0 ]
+}

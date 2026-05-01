@@ -5,6 +5,26 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 를 따릅니다.
 버전 관리는 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) 을 준수합니다.
 
+## [0.0.2] — 2026-05-01
+
+문서화, 설치 경로, 어댑터 명확성. 동작 변화 없음.
+
+### 추가
+
+- **skills.sh 설치 경로**: `npx skills add jazz1x/galmuri` 가 기존 `/plugin marketplace add` 플로우와 함께 동작 (Claude Code, Cursor, Codex, Windsurf 등 40+ 에이전트). 두 README 에 반영.
+- **회귀 테스트** (73 → 83): Skill-tool 위임 고정, prose 라우팅 고정 (`bc` 미사용), PostToolUse 자동 실행 고정, 그리고 e2e 엣지 케이스 6개 (빈 파일, 동일 해시 중복 기록, 빈 인덱스, diff-loss 경계).
+
+### 변경
+
+- **영문 베이스 SKILL.md**: 5개 SKILL.md 의 frontmatter description 과 본문이 모두 영문. 한국어 트리거 어구는 description 에 남겨 자동 호출이 그대로 동작. 한국어 본문은 `SKILL.ko.md` 에 유지.
+- **pitch 라우팅**: Step 1 의 `count-tokens.sh + bc` 인라인 서브프로세스를 prose 규칙으로 대체. 어댑터 라우팅에 외부 의존성 없음.
+- **explain Step 2**: Skill-tool 위임을 일급 지시로 승격 (기존엔 blockquote note).
+- **doc Step 5**: `PostToolUse` 훅 (`asset-record.sh`) 이 자동 실행됨을 명시; 수동 `record-asset.sh` 호출은 폴백 경로로만 사용.
+
+### 수정
+
+- **marketplace.json description**: `plugin.json` 은 영문이지만 marketplace.json 만 한국어였던 불일치를 영문으로 통일.
+
 ## [0.0.1] — 2026-04-28
 
 최초 릴리스. 엔진/어댑터 아키텍처, 이중 언어 지원, 훅 파이프라인, 자산 추적, 전체 테스트 스위트.

@@ -3,7 +3,7 @@ name: doc
 description: >
   Document adapter. Calls the distill engine, formats the result as markdown, and saves it to a file. Inherits the prior distill save flow.
   Triggers: "문서로", "정리해서 저장", "doc", "기록으로", "shrink", "줄여줘", "압축"
-version: 0.0.1
+version: 0.0.2
 ---
 
 # galmuri:doc — Document adapter
@@ -45,7 +45,10 @@ Default path: `docs/galmuri-doc-{slug}.md`
 - `edit-slug` → rename, then create.
 
 ## Step 5: Asset record
-After the file is created, run via the PostToolUse hook or directly:
+
+The PostToolUse hook (`hooks/shims/asset-record.sh`) runs **automatically** when the Write tool creates `docs/galmuri-doc-{slug}.md`. You do **not** need to invoke `record-asset.sh` manually.
+
+If for any reason the hook did not run (e.g., direct CLI invocation without hooks), call it manually:
 ```bash
 bash scripts/record-asset.sh --type doc --tags "doc,{slug}" \
   --source-ref ".galmuri/tmp/source-{slug}.txt" --output "docs/galmuri-doc-{slug}.md"

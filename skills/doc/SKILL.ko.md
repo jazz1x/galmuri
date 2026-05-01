@@ -3,7 +3,7 @@ name: doc
 description: >
   문서형 정리 어댑터. distill 엔진을 호출하여 markdown 정리 후 파일로 남김. 기존 distill 저장 플로우 계승.
   Triggers: "문서로", "정리해서 저장", "doc", "기록으로", "shrink", "줄여줘", "압축"
-version: 0.0.1
+version: 0.0.2
 ---
 
 # galmuri:doc — 문서형 정리
@@ -45,7 +45,10 @@ fi
 - `edit-slug` → 파일명 입력 후 생성.
 
 ## Step 5: Asset 기록
-파일 생성 후 PostToolUse 훅 또는 직접 호출:
+
+PostToolUse 훅 (`hooks/shims/asset-record.sh`) 이 Write 도구로 `docs/galmuri-doc-{slug}.md` 를 생성할 때 **자동으로 실행**됩니다. `record-asset.sh` 를 수동으로 호출할 필요가 없습니다.
+
+훅이 실행되지 않았을 경우 (예: 훅 없이 CLI 직접 실행) 아래 명령을 수동 실행:
 ```bash
 bash scripts/record-asset.sh --type doc --tags "doc,{slug}" \
   --source-ref ".galmuri/tmp/source-{slug}.txt" --output "docs/galmuri-doc-{slug}.md"

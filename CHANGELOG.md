@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.2] — 2026-05-01
+
+Documentation, install ergonomics, and adapter clarity. No behavior changes.
+
+### Added
+
+- **skills.sh install path**: `npx skills add jazz1x/galmuri` works alongside the existing `/plugin marketplace add` flow (Claude Code, Cursor, Codex, Windsurf, and 40+ other agents). Documented in both READMEs.
+- **Regression tests** (73 → 83): Skill-tool delegation pin, prose-routing pin (no `bc`), PostToolUse auto-execution pin, plus six edge-case e2e tests (empty files, duplicate-hash records, empty index, diff-loss boundaries).
+
+### Changed
+
+- **English-base SKILL.md**: All five SKILL.md frontmatter descriptions and bodies are now English. Korean trigger phrases are preserved in the description so auto-invocation on Korean still fires; full Korean prose remains in `SKILL.ko.md`.
+- **pitch routing**: Step 1 routing replaced inline `count-tokens.sh + bc` subprocess pair with prose rules. No external dependencies in adapter routing.
+- **explain Step 2**: Promoted Skill-tool delegation to a first-class instruction (was a blockquote note).
+- **doc Step 5**: Clarifies that the `PostToolUse` hook (`asset-record.sh`) runs automatically; manual `record-asset.sh` invocation is the fallback path only.
+
+### Fixed
+
+- **marketplace.json description**: Was Korean while `plugin.json` was English; both now English.
+
 ## [0.0.1] — 2026-04-28
 
 Initial release. Engine/adapter architecture, bilingual support, hooks pipeline, asset tracking, and full test suite.

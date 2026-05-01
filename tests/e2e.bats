@@ -415,3 +415,97 @@ EOF
   run bash scripts/i18n-sync-check.sh skill-test/SKILL.md
   [ "$status" -eq 0 ]
 }
+
+# ---------------------------------------------------------------------------
+# 13. record-asset.sh edge cases
+# ---------------------------------------------------------------------------
+
+@test "e2e: record-asset.sh exits non-zero when source file is missing" {
+  cd "$WORK"
+  run bash scripts/record-asset.sh \
+    --type doc \
+    --tags "doc,missing" \
+    --source-ref ".galmuri/tmp/nonexistent-source.txt" \
+    --output "docs/galmuri-doc-missing.md"
+  [ "$status" -ne 0 ]
+}
+
+@test "e2e: record-asset.sh records same-content twice (same hash, two entries)" {
+  echo "identical content" > "$WORK/.galmuri/tmp/source-dup.txt"
+  echo "output" > "$WORK/docs/galmuri-doc-dup.md"
+  cd "$WORK"
+  bash scripts/record-asset.sh --type doc --tags "doc,dup" \
+    --source-ref ".galmuri/tmp/source-dup.txt" \
+    --output "docs/galmuri-doc-dup.md"
+  bash scripts/record-asset.sh --type doc --tags "doc,dup" \
+    --source-ref ".galmuri/tmp/source-dup.txt" \
+    --output "docs/galmuri-doc-dup.md"
+  # Both records stored (dedup is intentionally not enforced at record time)
+  count=$(bash scripts/query-assets.sh --tags "dup" --limit 10 --format raw | grep -c .)
+  [ "$count" -ge 2 ]
+}
+
+# ---------------------------------------------------------------------------
+# 14. query-assets.sh edge cases
+# ---------------------------------------------------------------------------
+
+@test "e2e: query-assets.sh exits 0 with empty output when no assets exist" {
+  cd "$WORK"
+  # WORK has no assets at all
+  run bash scripts/query-assets.sh --type doc --limit 5 --format raw
+  [ "$status" -eq 0 ]
+  [ -z "$output" ]
+}
+
+@test "e2e: query-assets.sh --type all returns records of any type" {
+  echo "src" > "$WORK/.galmuri/tmp/source-all.txt"
+  echo "out" > "$WORK/docs/galmuri-pitch-all.md"
+  cd "$WORK"
+  bash scripts/record-asset.sh --type pitch --tags "pitch,all" \
+    --source-ref ".galmuri/tmp/source-all.txt" --output "docs/galmuri-pitch-all.md"
+  # query without --type filter should return all
+  run bash scripts/query-assets.sh --limit 10 --format raw
+  [ "$status" -eq 0 ]
+  echo "$output" | python3 -c "
+import json, sys
+rows = [json.loads(l) for l in sys.stdin if l.strip()]
+assert len(rows) >= 1, 'expected at least one record without type filter'
+"
+  [ "$?" -eq 0 ]
+}
+
+# ---------------------------------------------------------------------------
+# 15. diff-loss.sh edge cases
+# ---------------------------------------------------------------------------
+
+@test "e2e: diff-loss.sh handles empty before file gracefully" {
+  printf '' > "$WORK/empty.txt"
+  printf 'Some content.\n' > "$WORK/after.txt"
+  cd "$WORK"
+  run bash scripts/diff-loss.sh --before empty.txt --after after.txt
+  [ "$status" -eq 0 ]
+  # Empty before → no loss to report
+  [ -z "$output" ]
+}
+
+@test "e2e: diff-loss.sh handles empty after file (all content lost)" {
+  printf 'First sentence. Second sentence.\n' > "$WORK/before-full.txt"
+  printf '' > "$WORK/after-empty.txt"
+  cd "$WORK"
+  run bash scripts/diff-loss.sh --before before-full.txt --after after-empty.txt
+  [ "$status" -eq 0 ]
+  # All before content is "lost"
+  [[ "$output" == *"First sentence"* ]]
+}
+
+# ---------------------------------------------------------------------------
+# 16. consolidate-assets.sh edge cases
+# ---------------------------------------------------------------------------
+
+@test "e2e: consolidate-assets.sh exits 0 with empty index when no assets exist" {
+  cd "$WORK"
+  run bash scripts/consolidate-assets.sh
+  [ "$status" -eq 0 ]
+  # Index either does not exist or is empty — both indicate "no assets to consolidate"
+  [ ! -f ".galmuri/index.jsonl" ] || [ "$(wc -l < .galmuri/index.jsonl)" -eq 0 ]
+}
