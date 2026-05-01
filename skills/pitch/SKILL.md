@@ -14,25 +14,14 @@ version: 0.0.1
 
 ## Step 1: Alias detection + Audience (required)
 
-When triggered via `shrink` / `줄여줘` / `압축` — measure tokens, then route:
-```bash
-if [ ! -f ".galmuri/tmp/.warned-shrink" ]; then
-  echo "[deprecated] the 'shrink' trigger is routed to a context-based adapter. Scheduled for removal in a future release." >&2
-  touch ".galmuri/tmp/.warned-shrink"
-fi
-TOKEN_JSON=$(bash scripts/count-tokens.sh "$INPUT_FILE")
-TOKEN_COUNT=$(printf '%s' "$TOKEN_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['tokens'])")
-# Routing rules:
-# source_tokens ≥ 80 AND ratio ≤ 0.1 (or "one line / TL;DR") → pitch (run here)
-# source_tokens ≥ 80 AND ratio > 0.1 → delegate to doc
-# source_tokens < 80 → delegate to explain
-if [ "$TOKEN_COUNT" -ge 80 ] && [ "$(echo "$RATIO <= 0.1" | bc)" = "1" ]; then
-  : # pitch handles it
-else
-  echo "[shrink] this input fits the doc or explain adapter better. Re-invoke as /doc or /explain." >&2
-  exit 0
-fi
-```
+**When triggered via `shrink` / `줄여줘` / `압축`:** warn once that the shrink alias is deprecated, then apply the routing rules below to decide whether pitch is the right adapter.
+
+Routing rules (apply in order):
+- Input is **long (≥ 80 tokens) AND ratio ≤ 0.1** (or user says "one line" / "TL;DR") → pitch handles it, continue.
+- Input is **long AND ratio > 0.1** → tell the user: "This input is better suited for `/doc`. Please re-invoke as `/doc`." and stop.
+- Input is **short (< 80 tokens)** → tell the user: "Short input is better suited for `/explain`. Please re-invoke as `/explain`." and stop.
+
+**When triggered directly as `pitch`:** skip routing, proceed immediately.
 
 > "Who is this message for? (e.g. team lead, customer, Slack channel)"
 - If audience is missing, you MUST ask. No default.

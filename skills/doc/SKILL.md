@@ -45,7 +45,10 @@ Default path: `docs/galmuri-doc-{slug}.md`
 - `edit-slug` → rename, then create.
 
 ## Step 5: Asset record
-After the file is created, run via the PostToolUse hook or directly:
+
+The PostToolUse hook (`hooks/shims/asset-record.sh`) runs **automatically** when the Write tool creates `docs/galmuri-doc-{slug}.md`. You do **not** need to invoke `record-asset.sh` manually.
+
+If for any reason the hook did not run (e.g., direct CLI invocation without hooks), call it manually:
 ```bash
 bash scripts/record-asset.sh --type doc --tags "doc,{slug}" \
   --source-ref ".galmuri/tmp/source-{slug}.txt" --output "docs/galmuri-doc-{slug}.md"

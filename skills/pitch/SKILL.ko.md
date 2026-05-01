@@ -14,25 +14,14 @@ version: 0.0.1
 
 ## Step 1: Alias 감지 + Audience (필수)
 
-`shrink` / `줄여줘` / `압축` 키워드로 진입 시 — 토큰 수 측정 후 라우팅:
-```bash
-if [ ! -f ".galmuri/tmp/.warned-shrink" ]; then
-  echo "[deprecated] 'shrink' 트리거는 문맥 기반 어댑터로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
-  touch ".galmuri/tmp/.warned-shrink"
-fi
-TOKEN_JSON=$(bash scripts/count-tokens.sh "$INPUT_FILE")
-TOKEN_COUNT=$(printf '%s' "$TOKEN_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['tokens'])")
-# 라우팅 규칙:
-# source_tokens ≥ 80 AND ratio ≤ 0.1 → pitch 수행
-# source_tokens ≥ 80 AND ratio > 0.1 → doc 으로 재위임
-# source_tokens < 80 → explain 으로 재위임
-if [ "$TOKEN_COUNT" -ge 80 ] && [ "$(echo "$RATIO <= 0.1" | bc)" = "1" ]; then
-  : # pitch 수행
-else
-  echo "[shrink] 이 입력은 doc 또는 explain 어댑터에 더 적합합니다. /doc 또는 /explain 으로 재호출해주세요." >&2
-  exit 0
-fi
-```
+**`shrink` / `줄여줘` / `압축` 키워드로 진입 시:** shrink alias 가 deprecated 됐다고 한 번 안내한 후, 아래 라우팅 규칙으로 pitch 가 적합한 어댑터인지 판단합니다.
+
+라우팅 규칙 (순서대로 적용):
+- 입력이 **길고 (≥ 80 토큰) AND ratio ≤ 0.1** (또는 사용자가 "한 줄로" / "TL;DR" 요청) → pitch 수행, 계속 진행.
+- 입력이 **길고 AND ratio > 0.1** → 사용자에게 안내: "이 분량은 `/doc`이 더 적합합니다. `/doc`으로 재호출해 주세요." 후 종료.
+- 입력이 **짧음 (< 80 토큰)** → 사용자에게 안내: "짧은 입력은 `/explain`이 더 적합합니다. `/explain`으로 재호출해 주세요." 후 종료.
+
+**`pitch` 로 직접 진입 시:** 라우팅 건너뛰고 바로 진행.
 
 > "누구에게 보낼 메시지인가요? (예: 팀장, 고객, 슬랙 채널)"
 - audience 미지정 시 반드시 질의. 기본값 없음.

@@ -28,13 +28,16 @@ fi
 - audience 는 `me` 자동 고정 (별도 질의 없음).
 
 ## Step 2: 엔진 호출
-> Claude Code skill 프레임워크에서 어댑터가 엔진을 호출하는 공식 경로는 **동일 세션 내 `distill` skill 을 Skill tool 로 호출** 하는 것.
-> 호출 시 전달 인자:
->   - `--mode reduce`
->   - `--ratio 0.2`
->   - `--audience me`
->   - `--input` = Step 1 의 tmp 파일 경로
-> 엔진 응답은 EngineOutput JSON 으로 반환받고 Step 3 이 이어 렌더.
+
+**Skill tool** 로 `galmuri:distill` 스킬을 아래 인자로 호출합니다:
+
+```
+--mode reduce --ratio 0.2 --audience me --input {Step 1 의 tmp 파일 경로}
+```
+
+엔진이 반환하는 EngineOutput JSON 을 Step 3 에 바로 전달합니다.
+
+distill 로직을 여기서 인라인으로 실행하지 않습니다 — 항상 스킬에 위임합니다.
 
 ## Step 3: 렌더
 - EngineOutput.units → inline markdown:

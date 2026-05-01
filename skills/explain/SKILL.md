@@ -29,13 +29,16 @@ fi
 - audience is locked to `me` automatically (no separate prompt).
 
 ## Step 2: Engine Invoke
-> The official adapter→engine path under the Claude Code skill framework is to **call the `distill` skill via the Skill tool inside the same session**.
-> Arguments to pass:
->   - `--mode reduce`
->   - `--ratio 0.2`
->   - `--audience me`
->   - `--input` = the tmp file path from Step 1
-> The engine returns an EngineOutput JSON; Step 3 picks it up and renders.
+
+Call the `galmuri:distill` skill via the **Skill tool** with these arguments:
+
+```
+--mode reduce --ratio 0.2 --audience me --input {tmp file path from Step 1}
+```
+
+The engine returns an EngineOutput JSON. Pass it directly to Step 3.
+
+Do **not** attempt to inline the distill logic here — always delegate to the skill.
 
 ## Step 3: Render
 - EngineOutput.units → inline markdown:
