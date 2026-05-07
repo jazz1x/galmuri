@@ -2,8 +2,25 @@
 name: deck
 description: >
   Deck generation adapter. Requires a preset selection. Emits two files — a SlideSpec JSON and a presentation script markdown. No binary build.
-  Triggers: "덱", "슬라이드", "deck", "발표 자료", "decide", "의사결정", "A vs B", "결정해", "뭐가 나아"
-version: 0.0.2
+  Triggers: "덱", "슬라이드", "deck", "발표 자료", "A vs B", "뭐가 나아"
+version: 0.0.3
+ssl:
+  scheduling:
+    anti_triggers:
+      - "Single binary decision without slide intent — use harnish:forki"
+      - "Document-style output without slides — use doc"
+  structural:
+    scenes: [Preset selection, Engine Invoke, SlideSpec generation, Save]
+    resumable: false
+  logical:
+    tools: [Skill, Write]
+    side_effects:
+      reads: ["skills/deck/references/preset-{name}.md", "skills/deck/references/design-tokens.md"]
+      writes: ["docs/galmuri-deck-{slug}.json", "docs/galmuri-deck-{slug}.md"]
+      deletes: []
+      network: []
+    idempotent: false
+    rollback: "User answers 'n' at Save HITL → no files created."
 ---
 
 # galmuri:deck — Deck generation adapter
@@ -12,17 +29,7 @@ version: 0.0.2
 - `scripts/preflight.sh` passes.
 - `skills/distill/` engine is installed.
 
-## Step 1: Alias detection + Preset selection (required)
-
-When triggered via `decide` / `의사결정` / `A vs B` / `결정해` / `뭐가 나아`:
-```bash
-# deprecation warning (once per session)
-if [ ! -f ".galmuri/tmp/.warned-decide" ]; then
-  echo "[deprecated] the 'decide' trigger is routed to deck --preset decision-sandwich-6. Scheduled for removal in a future release." >&2
-  touch ".galmuri/tmp/.warned-decide"
-fi
-```
-On alias detection, `--preset decision-sandwich-6` is auto-injected.
+## Step 1: Preset selection (required)
 
 When `--preset` is missing, ask via HITL:
 > "Which preset should we use? e.g. `decision-sandwich-6`, `pitch-deck`, `concept-explain`, `story-arc`

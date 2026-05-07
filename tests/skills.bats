@@ -62,24 +62,27 @@ assert not bad, bad
 }
 
 # ── explain adapter: no forbidden save/persist words ─────────────────────────
+# Body-scoped (after the second `---` delimiter). Frontmatter ssl: blocks may
+# legitimately mention `writes:` as part of the side_effects schema.
 
-@test "explain/SKILL.md contains no save/persist/record forbidden words" {
-  run bash -c "! grep -qE '저장|기록|save|write|persist|docs/galmuri|record-asset|PostToolUse' \
-    '$REPO_ROOT/skills/explain/SKILL.md'"
+@test "explain/SKILL.md body contains no save/persist/record forbidden words" {
+  run bash -c "! awk '/^---\$/{c++; next} c==2' '$REPO_ROOT/skills/explain/SKILL.md' \
+    | grep -qE '저장|기록|save|write|persist|docs/galmuri|record-asset|PostToolUse'"
   [ "$status" -eq 0 ]
 }
 
-@test "explain/SKILL.md does not query audience" {
-  run bash -c "! grep -qE 'audience 질의|누구한테|누구 용|청자|for whom|target audience' \
-    '$REPO_ROOT/skills/explain/SKILL.md'"
+@test "explain/SKILL.md body does not query audience" {
+  run bash -c "! awk '/^---\$/{c++; next} c==2' '$REPO_ROOT/skills/explain/SKILL.md' \
+    | grep -qE 'audience 질의|누구한테|누구 용|청자|for whom|target audience'"
   [ "$status" -eq 0 ]
 }
 
 # ── deck adapter: no binary build words ──────────────────────────────────────
+# Body-scoped (after the second `---` delimiter).
 
-@test "deck/SKILL.md contains no binary build forbidden words" {
-  run bash -c "! grep -iE 'pptx|keynote|build.*binary' \
-    '$REPO_ROOT/skills/deck/SKILL.md'"
+@test "deck/SKILL.md body contains no binary build forbidden words" {
+  run bash -c "! awk '/^---\$/{c++; next} c==2' '$REPO_ROOT/skills/deck/SKILL.md' \
+    | grep -iE 'pptx|keynote|build.*binary'"
   [ "$status" -eq 0 ]
 }
 
@@ -155,5 +158,162 @@ assert not missing, f'missing presets: {missing}'
 
 @test "doc/SKILL.md Step 5 states PostToolUse hook runs automatically" {
   run grep -q 'automatically' "$REPO_ROOT/skills/doc/SKILL.md"
+  [ "$status" -eq 0 ]
+}
+
+# ── SSL frontmatter contract (audit follow-up) ────────────────────────────────
+# Every SKILL.md (en + ko) must declare an `ssl:` block in its YAML frontmatter
+# with the keys the skill-auditor relies on: anti_triggers, idempotent, side_effects.
+
+@test "every SKILL.md frontmatter declares an ssl: block" {
+  run python3 - <<'PY'
+import sys, glob, yaml
+bad = []
+for f in glob.glob("skills/*/SKILL.md") + glob.glob("skills/*/SKILL.ko.md"):
+    with open(f) as fh:
+        parts = fh.read().split('---', 2)
+    fm = yaml.safe_load(parts[1])
+    if not isinstance(fm, dict) or 'ssl' not in fm:
+        bad.append(f)
+assert not bad, f"missing ssl: block in {bad}"
+PY
+  [ "$status" -eq 0 ]
+}
+
+@test "every SKILL.md ssl block declares idempotent and side_effects" {
+  run python3 - <<'PY'
+import sys, glob, yaml
+bad = []
+for f in glob.glob("skills/*/SKILL.md") + glob.glob("skills/*/SKILL.ko.md"):
+    with open(f) as fh:
+        parts = fh.read().split('---', 2)
+    fm = yaml.safe_load(parts[1])
+    ssl = fm.get('ssl', {})
+    logical = ssl.get('logical', {})
+    if 'idempotent' not in logical or 'side_effects' not in logical:
+        bad.append(f)
+assert not bad, f"missing idempotent or side_effects in {bad}"
+PY
+  [ "$status" -eq 0 ]
+}
+
+@test "every SKILL.md ssl block declares scheduling.anti_triggers" {
+  run python3 - <<'PY'
+import sys, glob, yaml
+bad = []
+for f in glob.glob("skills/*/SKILL.md") + glob.glob("skills/*/SKILL.ko.md"):
+    with open(f) as fh:
+        parts = fh.read().split('---', 2)
+    fm = yaml.safe_load(parts[1])
+    sched = fm.get('ssl', {}).get('scheduling', {})
+    if not sched.get('anti_triggers'):
+        bad.append(f)
+assert not bad, f"missing scheduling.anti_triggers in {bad}"
+PY
+  [ "$status" -eq 0 ]
+}
+
+# ── deck adapter: trigger disambiguation from harnish:forki ──────────────────
+
+@test "deck/SKILL.md description triggers do not claim Korean decide aliases" {
+  # These belong to harnish:forki — keeping them here causes auto-invocation collisions.
+  run bash -c "! awk '/^---\$/{c++; next} c==1' '$REPO_ROOT/skills/deck/SKILL.md' \
+    | grep -E '\"decide\"|\"의사결정\"|\"결정해\"'"
+  [ "$status" -eq 0 ]
+}
+
+@test "deck/SKILL.ko.md description triggers do not claim Korean decide aliases" {
+  run bash -c "! awk '/^---\$/{c++; next} c==1' '$REPO_ROOT/skills/deck/SKILL.ko.md' \
+    | grep -E '\"decide\"|\"의사결정\"|\"결정해\"'"
+  [ "$status" -eq 0 ]
+}
+
+# ── ssl block invariants (catch silent breakage) ──────────────────────────────
+
+@test "every SKILL.md ssl.logical.idempotent is a boolean" {
+  run python3 - <<'PY'
+import glob, yaml
+bad = []
+for f in sorted(glob.glob("skills/*/SKILL.md") + glob.glob("skills/*/SKILL.ko.md")):
+    fm = yaml.safe_load(open(f).read().split('---', 2)[1])
+    val = fm.get('ssl', {}).get('logical', {}).get('idempotent')
+    if not isinstance(val, bool):
+        bad.append(f"{f}: idempotent={val!r} (type={type(val).__name__})")
+assert not bad, bad
+PY
+  [ "$status" -eq 0 ]
+}
+
+@test "ssl logical/structural fields match between SKILL.md and SKILL.ko.md" {
+  # Technical fields are contracts — they must be identical across locales.
+  # Only user-facing prose (anti_triggers, rollback, branches text) may differ.
+  run python3 - <<'PY'
+import glob, os, yaml
+bad = []
+for en in sorted(glob.glob("skills/*/SKILL.md")):
+    ko = en[:-3] + ".ko.md"
+    if not os.path.isfile(ko):
+        continue
+    a = yaml.safe_load(open(en).read().split('---', 2)[1]).get('ssl', {})
+    b = yaml.safe_load(open(ko).read().split('---', 2)[1]).get('ssl', {})
+    for sec in ('structural', 'logical'):
+        for key in ('scenes', 'resumable', 'tools', 'side_effects', 'idempotent'):
+            av = a.get(sec, {}).get(key)
+            bv = b.get(sec, {}).get(key)
+            if av != bv:
+                bad.append(f"{en}: ssl.{sec}.{key} drift between en/ko")
+assert not bad, bad
+PY
+  [ "$status" -eq 0 ]
+}
+
+# ── pitch adapter: ratio inference disclaimer is load-bearing ────────────────
+
+@test "pitch/SKILL.md pins the ratio-inference disclaimer in body" {
+  # Without this note, future contributors will mistake `ratio` for a user-input
+  # variable and reintroduce a prompt for it.
+  run grep -qE 'ratio.*inferred|inferred.*ratio' "$REPO_ROOT/skills/pitch/SKILL.md"
+  [ "$status" -eq 0 ]
+}
+
+# ── audit skill: trigger disambiguation from harnish:ralphi/forki ──────────────
+
+@test "skills/audit directory exists with both .md and .ko.md" {
+  [ -f "$REPO_ROOT/skills/audit/SKILL.md" ]
+  [ -f "$REPO_ROOT/skills/audit/SKILL.ko.md" ]
+}
+
+@test "audit/SKILL.md description excludes ralphi inspection triggers" {
+  # Substring check on the description line — these are harnish:ralphi triggers.
+  run bash -c "! awk '/^---\$/{c++; next} c==1' '$REPO_ROOT/skills/audit/SKILL.md' \
+    | grep -E '\"점검해\"|\"검증해\"|\"확인해\"|\"셀프점검\"'"
+  [ "$status" -eq 0 ]
+}
+
+@test "audit/SKILL.md description includes a positive ssl/audit trigger" {
+  run bash -c "awk '/^---\$/{c++; next} c==1' '$REPO_ROOT/skills/audit/SKILL.md' \
+    | grep -qE '\"ssl audit\"|\"skill audit\"|\"audit skill\"'"
+  [ "$status" -eq 0 ]
+}
+
+@test "audit/SKILL.md anti_triggers reference ralphi and forki by name" {
+  run python3 - <<'PY'
+import yaml
+fm = yaml.safe_load(open("skills/audit/SKILL.md").read().split('---',2)[1])
+at = fm['ssl']['scheduling']['anti_triggers']
+joined = ' '.join(at)
+assert 'ralphi' in joined, f"audit anti_triggers should mention ralphi: {at}"
+assert 'forki' in joined, f"audit anti_triggers should mention forki: {at}"
+PY
+  [ "$status" -eq 0 ]
+}
+
+@test "audit/SKILL.md is declared idempotent — static analysis must be deterministic" {
+  run python3 - <<'PY'
+import yaml
+fm = yaml.safe_load(open("skills/audit/SKILL.md").read().split('---',2)[1])
+val = fm['ssl']['logical']['idempotent']
+assert val is True, f"audit must be idempotent: true (got {val!r})"
+PY
   [ "$status" -eq 0 ]
 }

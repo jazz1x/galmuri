@@ -20,6 +20,9 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Install Python deps
+        run: pip install pyyaml
+
       - name: Install bats (ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: sudo apt-get update && sudo apt-get install -y bats
@@ -29,4 +32,7 @@ jobs:
         run: brew install bats-core
 
       - name: Run test suite
+        env:
+          LC_ALL: en_US.UTF-8
+          LANG: en_US.UTF-8
         run: bash tests/run.sh

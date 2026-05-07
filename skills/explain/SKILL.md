@@ -4,7 +4,24 @@ description: >
   Inline self-comprehension adapter. Calls the distill engine to extract the essence of long text and renders it as inline markdown.
   audience=me is auto-fixed. Output only — no file generation.
   Triggers: "설명해", "이해하게", "explain", "정리해서 보여줘", "readme 읽고", "shrink", "줄여줘", "압축"
-version: 0.0.2
+version: 0.0.3
+ssl:
+  scheduling:
+    anti_triggers:
+      - "Inputs under ~30 tokens (use chat directly)"
+      - "When the user wants a saved file (use doc instead)"
+  structural:
+    scenes: [Alias detection + Input Capture, Engine Invoke, Render, Output]
+    resumable: false
+  logical:
+    tools: [Bash, Skill]
+    side_effects:
+      reads: ["{input}"]
+      writes: [".galmuri/tmp/source-{slug}.txt", ".galmuri/tmp/.warned-shrink"]
+      deletes: []
+      network: []
+    idempotent: false
+    rollback: null
 ---
 
 # galmuri:explain — Inline reader-side summary

@@ -2,7 +2,7 @@
 
 > Claude Code 플러그인 — 맥락을 모으고, 정리하고, 갈무리한다
 
-![version](https://img.shields.io/badge/version-0.0.2-blue)
+![version](https://img.shields.io/badge/version-0.0.3-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
 
@@ -12,7 +12,7 @@
 
 ## 아키텍처
 
-galmuri 는 **엔진 1개 + 어댑터 4개** 구조:
+galmuri 는 **엔진 1개 + 어댑터 4개 + 메타 스킬 1개** 구조:
 
 ```
                     ┌─────────────────────────────────┐
@@ -30,6 +30,11 @@ galmuri 는 **엔진 1개 + 어댑터 4개** 구조:
                     │ decision-sandwich-6  pitch-deck   │
                     │ concept-explain      story-arc    │
                     └──────────────────────────────────┘
+
+                    ┌─────────────────────────────────┐
+                    │     audit (메타 · 읽기 전용)       │
+                    │  SKILL.md SSL 분해 진단           │
+                    └─────────────────────────────────┘
 ```
 
 | Skill | 역할 | 출력 |
@@ -39,6 +44,7 @@ galmuri 는 **엔진 1개 + 어댑터 4개** 구조:
 | **pitch** | 지정 청자를 위한 Hook-Core-CTA 3–5줄 | stdout 전용 |
 | **doc** | 정제된 markdown → `docs/` 저장 | `docs/galmuri-doc-{slug}.md` |
 | **deck** | Jobs-inspired 디자인 토큰 기반 슬라이드 카피 (JSON + markdown) | `galmuri-deck-{slug}.json` + `galmuri-deck-{slug}.md` |
+| **audit** | 임의의 SKILL.md 에 대한 SSL(Scheduling-Structural-Logical) 분해 — 읽기 전용 진단 | `.galmuri/audit-{slug}.md` 또는 stdout |
 
 ## 설치
 
@@ -66,6 +72,7 @@ explain
 pitch
 doc
 deck
+audit
 ```
 
 ### 1. 마켓플레이스 등록
@@ -85,7 +92,7 @@ Claude Code 세션 안에서 실행:
 예상 출력:
 
 ```
-✓ Installed galmuri@0.0.2 — 5 skills registered (distill, explain, pitch, doc, deck)
+✓ Installed galmuri@0.0.3 — 6 skills registered (distill, explain, pitch, doc, deck, audit)
 ```
 
 ### 3. 확인
@@ -94,7 +101,7 @@ Claude Code 세션 안에서 실행:
 /plugin list
 ```
 
-아래 슬래시 명령 5개가 자동완성되면 정상:
+아래 슬래시 명령 6개가 자동완성되면 정상:
 
 ```
 /galmuri:distill
@@ -102,6 +109,7 @@ Claude Code 세션 안에서 실행:
 /galmuri:pitch
 /galmuri:doc
 /galmuri:deck
+/galmuri:audit
 ```
 
 ### 4. (선택) 훅 설치
@@ -232,14 +240,15 @@ Jobs-inspired 디자인 토큰 (SF Pro, 16:9, dark-light-dark 패턴) 기반 슬
 
 ## 하위 호환성
 
-`decide` 와 `shrink` 트리거는 현재 0.0.x 라인에서 문맥에 맞는 어댑터로 라우팅된다. **향후 릴리스에서 제거** 예정.
+`shrink` 는 호환성을 위해 유지되는 문맥 기반 alias 다. **향후 릴리스에서 제거** 예정.
 
-| 구 트리거 | 라우팅 대상 |
-|-------------|-----------|
-| `decide`, `결정` | `deck --preset decision-sandwich-6` |
-| `shrink`, `줄여줘`, `압축` | `explain` (짧은 원문) 또는 `doc` (긴 원문) |
+| 트리거 | 라우팅 대상 |
+|---------|-----------|
+| `shrink`, `줄여줘`, `압축` | `explain` (짧은 원문) 또는 `doc` (긴 원문); 사용자가 한 줄 / TL;DR 을 명시할 때 `pitch` |
 
-구 트리거 최초 사용 시 세션당 1회 deprecation 경고 출력.
+세션당 1회 deprecation 경고 출력.
+
+**0.0.3 에서 제거:** `decide` / `의사결정` / `결정해` 트리거는 더 이상 `deck` 으로 자동 라우팅되지 않는다. 2지선택 결정에는 `harnish:forki` 를, 슬라이드가 필요할 땐 `deck --preset decision-sandwich-6` 을 명시 호출.
 
 ## Contributing
 

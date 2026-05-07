@@ -3,7 +3,24 @@ name: doc
 description: >
   Document adapter. Calls the distill engine, formats the result as markdown, and saves it to a file. Inherits the prior distill save flow.
   Triggers: "문서로", "정리해서 저장", "doc", "기록으로", "shrink", "줄여줘", "압축"
-version: 0.0.2
+version: 0.0.3
+ssl:
+  scheduling:
+    anti_triggers:
+      - "When the user wants a 3–5 line message — use pitch"
+      - "When the user wants inline output without a saved file — use explain"
+  structural:
+    scenes: [Alias detection + Audience, Engine Invoke, Render, Save, Asset record]
+    resumable: false
+  logical:
+    tools: [Skill, Write, Bash]
+    side_effects:
+      reads: ["{input}", ".galmuri/tmp/source-{slug}.txt"]
+      writes: ["docs/galmuri-doc-{slug}.md", ".galmuri/assets/*.jsonl"]
+      deletes: []
+      network: []
+    idempotent: false
+    rollback: "If the PostToolUse hook fails, recover by running scripts/record-asset.sh manually (see Step 5)."
 ---
 
 # galmuri:doc — Document adapter

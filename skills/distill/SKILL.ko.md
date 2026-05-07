@@ -3,7 +3,24 @@ name: distill
 description: >
   코어 엔진. 본질환원 + 제1원칙 분해 + 소크라테스 검증. 어댑터가 호출하거나 직접 호출 가능. 저장 없음 (어댑터 책임).
   Triggers: "distill", "핵심만", "본질", "distill engine"
-version: 0.0.2
+version: 0.0.3
+ssl:
+  scheduling:
+    anti_triggers:
+      - "어댑터 (explain/pitch/doc/deck) 가 더 적합한 상황의 직접 호출"
+      - "30 토큰 미만 입력 — 채팅 직접 사용"
+  structural:
+    scenes: [Input Capture, Mode Selection, Apply 3 Methods, Ratio Validation, Output]
+    resumable: true
+  logical:
+    tools: [Bash, Read]
+    side_effects:
+      reads: ["{input}", ".galmuri/tmp/retry-count.{slug}", "skills/distill/references/*"]
+      writes: [".galmuri/tmp/source-{slug}.txt", ".galmuri/tmp/retry-count.{slug}"]
+      deletes: [".galmuri/tmp/retry-count.{slug}"]
+      network: []
+    idempotent: false
+    rollback: "Step 1 진입과 Step 5 종료 시 카운터 파일 정리. LLM 측 중간 실패: Step 1 부터 재실행."
 ---
 
 # galmuri:distill — 코어 엔진

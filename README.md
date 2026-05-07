@@ -2,7 +2,7 @@
 
 > Claude Code plugin — gather, organize, and keep context
 
-![version](https://img.shields.io/badge/version-0.0.2-blue)
+![version](https://img.shields.io/badge/version-0.0.3-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
 
@@ -12,7 +12,7 @@
 
 ## Architecture
 
-galmuri is organized as **one engine + four adapters**:
+galmuri is organized as **one engine + four adapters + one meta-skill**:
 
 ```
                     ┌─────────────────────────────────┐
@@ -30,6 +30,11 @@ galmuri is organized as **one engine + four adapters**:
                     │ decision-sandwich-6  pitch-deck   │
                     │ concept-explain      story-arc    │
                     └──────────────────────────────────┘
+
+                    ┌─────────────────────────────────┐
+                    │      audit (meta · read-only)    │
+                    │   SSL decomposition of any SKILL │
+                    └─────────────────────────────────┘
 ```
 
 | Skill | Role | Output |
@@ -39,6 +44,7 @@ galmuri is organized as **one engine + four adapters**:
 | **pitch** | Hook-Core-CTA in 3–5 lines for a named audience | stdout only |
 | **doc** | Distilled markdown saved to `docs/` | `docs/galmuri-doc-{slug}.md` |
 | **deck** | Structured slide copy (JSON + markdown) using Jobs-inspired design tokens | `galmuri-deck-{slug}.json` + `galmuri-deck-{slug}.md` |
+| **audit** | SSL (Scheduling-Structural-Logical) decomposition of any SKILL.md — read-only diagnostic | `.galmuri/audit-{slug}.md` or stdout |
 
 ## Install
 
@@ -66,6 +72,7 @@ explain
 pitch
 doc
 deck
+audit
 ```
 
 ### 1. Register the marketplace
@@ -85,7 +92,7 @@ Inside a Claude Code session, run:
 Expected output:
 
 ```
-✓ Installed galmuri@0.0.2 — 5 skills registered (distill, explain, pitch, doc, deck)
+✓ Installed galmuri@0.0.3 — 6 skills registered (distill, explain, pitch, doc, deck, audit)
 ```
 
 ### 3. Verify
@@ -94,7 +101,7 @@ Expected output:
 /plugin list
 ```
 
-All five slash commands should autocomplete:
+All six slash commands should autocomplete:
 
 ```
 /galmuri:distill
@@ -102,6 +109,7 @@ All five slash commands should autocomplete:
 /galmuri:pitch
 /galmuri:doc
 /galmuri:deck
+/galmuri:audit
 ```
 
 ### 4. (Optional) Install hooks
@@ -234,14 +242,15 @@ Natural language triggers: `슬라이드로`, `deck 만들어`, `발표자료`
 
 ## Backwards Compatibility
 
-`decide` and `shrink` trigger phrases are routed to context-appropriate adapters in the current 0.0.x line. They will be **removed in a future release**.
+`shrink` is a context-routed alias retained for compatibility. It will be **removed in a future release**.
 
-| Old trigger | Routes to |
-|-------------|-----------|
-| `decide`, `결정` | `deck --preset decision-sandwich-6` |
-| `shrink`, `줄여줘`, `압축` | `explain` (short source) or `doc` (long source) |
+| Trigger | Routes to |
+|---------|-----------|
+| `shrink`, `줄여줘`, `압축` | `explain` (short source) or `doc` (long source); `pitch` when the user explicitly asks for one line / TL;DR |
 
-A one-time deprecation warning fires per session on first use of the old trigger.
+A one-time deprecation warning fires per session on first use.
+
+**Removed in 0.0.3:** the `decide` / `의사결정` / `결정해` triggers no longer auto-route to `deck`. Use `harnish:forki` for binary decision forcing, or invoke `deck --preset decision-sandwich-6` explicitly when slides are the deliverable.
 
 ## Contributing
 
