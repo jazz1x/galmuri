@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.3] — 2026-05-07
+
+Audit follow-up: every SKILL adopts the SSL (Scheduling-Structural-Logical) frontmatter contract, deck triggers narrow to resolve a collision with `harnish:forki`, and pitch's routing rule clarifies that `ratio` is inferred — not a user-input variable.
+
+### Added
+
+- **SSL frontmatter on all 5 skills**: every `SKILL.md` and `SKILL.ko.md` now declares an `ssl:` block with `scheduling.anti_triggers`, `structural.scenes`, `structural.resumable`, `logical.tools`, `logical.side_effects` (reads/writes/deletes/network), `logical.idempotent`, and `logical.rollback`. Surfaces the side-effect contract for static auditors and downstream consumers.
+- **+8 regression tests** (83 → 91): `ssl:` block presence, idempotent boolean type, scheduling.anti_triggers presence, en/ko parity for technical fields (scenes/tools/side_effects/idempotent), deck description triggers do not claim decide/의사결정/결정해, pitch ratio-inference disclaimer is pinned in body.
+
+### Changed
+
+- **deck triggers narrowed**: `decide`, `의사결정`, `결정해` removed from the deck adapter's description. These were ambiguous with `harnish:forki` (verbatim `decide` collision + `결정해⊃결정` substring match). Remaining triggers: `덱`, `슬라이드`, `deck`, `발표 자료`, `A vs B`, `뭐가 나아`.
+- **deck Step 1 simplified**: dropped the deprecation-warning bash block since the deprecated triggers are gone. Heading became `Step 1: Preset selection (required)`.
+- **pitch Step 1 prose**: added a one-line note that `ratio` in routing rules is inferred from natural-language signal ("한 줄"/"TL;DR"/"one line"), not a user-input variable. The hardcoded `--ratio 0.08` is in Step 2.
+- **explain forbidden-words test scoped to body**: the test now greps the body only (after the second `---`). Frontmatter `ssl:` blocks may legitimately mention `writes:` as part of the `side_effects` schema.
+
+### Removed
+
+- **`decide` / `의사결정` / `결정해` deprecation aliases on deck.** These had been routed to `deck --preset decision-sandwich-6` since 0.0.1 with a one-time per-session warning. Users invoking decision-style prompts should now use `harnish:forki` for binary decision forcing, or call `deck --preset decision-sandwich-6` explicitly when slides are the intended deliverable. README and CHANGELOG references updated.
+
+### Fixed
+
+- **distill `rm -f` was undeclared**: Step 1 + Step 5 delete `.galmuri/tmp/retry-count.{slug}` but the frontmatter never declared it. Now in `ssl.logical.side_effects.deletes`.
+- **doc/deck non-idempotency was undeclared**: re-runs append duplicate asset records (test `e2e.bats:433` confirms dedup is intentionally not enforced at record time). Now declared as `ssl.logical.idempotent: false` with the manual `record-asset.sh` recovery path documented in `rollback`.
+
 ## [0.0.2] — 2026-05-01
 
 Documentation, install ergonomics, and adapter clarity. No behavior changes.

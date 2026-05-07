@@ -5,6 +5,31 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 를 따릅니다.
 버전 관리는 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) 을 준수합니다.
 
+## [0.0.3] — 2026-05-07
+
+Audit 후속: 5개 스킬 모두 SSL(Scheduling-Structural-Logical) frontmatter 계약을 채택, deck 트리거를 좁혀 `harnish:forki` 와의 충돌 해소, pitch 라우팅 룰의 `ratio` 가 사용자 입력 변수가 아님을 명시.
+
+### 추가
+
+- **5개 스킬 전체 SSL frontmatter**: 모든 `SKILL.md` 와 `SKILL.ko.md` 가 `scheduling.anti_triggers`, `structural.scenes`, `structural.resumable`, `logical.tools`, `logical.side_effects` (reads/writes/deletes/network), `logical.idempotent`, `logical.rollback` 을 포함한 `ssl:` 블록 선언. 정적 auditor 와 하류 consumer 를 위한 부작용 계약을 표면화.
+- **회귀 테스트 +8건** (83 → 91): `ssl:` 블록 존재, idempotent 가 boolean 타입, scheduling.anti_triggers 존재, 기술 필드 en/ko 동치 (scenes/tools/side_effects/idempotent), deck 트리거에 decide/의사결정/결정해 없음, pitch ratio 추론 disclaimer 본문 고정.
+
+### 변경
+
+- **deck 트리거 narrowing**: deck 어댑터의 description 에서 `decide`, `의사결정`, `결정해` 제거. `harnish:forki` 와 모호 (`decide` verbatim 일치 + `결정해⊃결정` substring 매치) 했던 항목들. 잔여 트리거: `덱`, `슬라이드`, `deck`, `발표 자료`, `A vs B`, `뭐가 나아`.
+- **deck Step 1 간소화**: deprecated 트리거가 사라졌으므로 deprecation 경고 bash 블록 제거. 헤딩을 `Step 1: 프리셋 선택 (필수)` 로 변경.
+- **pitch Step 1 본문**: 라우팅 룰의 `ratio` 는 자연어 신호 (`한 줄` / `TL;DR` / `one line`) 로부터 **추론**되는 값이지 사용자 입력 변수가 아님을 한 줄로 명시. 실제 `--ratio 0.08` 은 Step 2 에서 하드코딩.
+- **explain forbidden-words 테스트 본문 한정**: 두 번째 `---` 이후 본문만 grep. frontmatter 의 `ssl:` 블록이 `side_effects` 스키마의 일부로 `writes:` 를 정당하게 언급할 수 있도록.
+
+### 제거
+
+- **deck 의 `decide` / `의사결정` / `결정해` deprecation alias**. 0.0.1 부터 세션당 1회 경고와 함께 `deck --preset decision-sandwich-6` 으로 라우팅되던 동작이다. 결정형 프롬프트는 이제 binary 결정에 `harnish:forki` 를, 슬라이드가 필요하면 `deck --preset decision-sandwich-6` 을 명시 호출. README · CHANGELOG 참조 갱신.
+
+### 수정
+
+- **distill `rm -f` 가 미선언**: Step 1 + Step 5 가 `.galmuri/tmp/retry-count.{slug}` 를 삭제하는데 frontmatter 에 선언이 없었음. 이제 `ssl.logical.side_effects.deletes` 에 있음.
+- **doc/deck 비멱등이 미선언**: 재실행 시 자산 기록이 중복 append (`e2e.bats:433` 의 "dedup is intentionally not enforced at record time" 으로 확정). 이제 `ssl.logical.idempotent: false` 로 선언, 수동 `record-asset.sh` 복구 경로를 `rollback` 에 문서화.
+
 ## [0.0.2] — 2026-05-01
 
 문서화, 설치 경로, 어댑터 명확성. 동작 변화 없음.
