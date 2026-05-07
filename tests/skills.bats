@@ -215,14 +215,14 @@ PY
 
 # ── deck adapter: trigger disambiguation from harnish:forki ──────────────────
 
-@test "deck/SKILL.md description triggers do not claim decide/의사결정/결정해" {
+@test "deck/SKILL.md description triggers do not claim Korean decide aliases" {
   # These belong to harnish:forki — keeping them here causes auto-invocation collisions.
   run bash -c "! awk '/^---\$/{c++; next} c==1' '$REPO_ROOT/skills/deck/SKILL.md' \
     | grep -E '\"decide\"|\"의사결정\"|\"결정해\"'"
   [ "$status" -eq 0 ]
 }
 
-@test "deck/SKILL.ko.md description triggers do not claim decide/의사결정/결정해" {
+@test "deck/SKILL.ko.md description triggers do not claim Korean decide aliases" {
   run bash -c "! awk '/^---\$/{c++; next} c==1' '$REPO_ROOT/skills/deck/SKILL.ko.md' \
     | grep -E '\"decide\"|\"의사결정\"|\"결정해\"'"
   [ "$status" -eq 0 ]
@@ -283,7 +283,7 @@ PY
   [ -f "$REPO_ROOT/skills/audit/SKILL.ko.md" ]
 }
 
-@test "audit/SKILL.md description triggers do not claim 점검해/검증해 (ralphi territory)" {
+@test "audit/SKILL.md description excludes ralphi inspection triggers" {
   # Substring check on the description line — these are harnish:ralphi triggers.
   run bash -c "! awk '/^---\$/{c++; next} c==1' '$REPO_ROOT/skills/audit/SKILL.md' \
     | grep -E '\"점검해\"|\"검증해\"|\"확인해\"|\"셀프점검\"'"
@@ -308,7 +308,7 @@ PY
   [ "$status" -eq 0 ]
 }
 
-@test "audit/SKILL.md is declared idempotent (static analysis must be deterministic)" {
+@test "audit/SKILL.md is declared idempotent — static analysis must be deterministic" {
   run python3 - <<'PY'
 import yaml
 fm = yaml.safe_load(open("skills/audit/SKILL.md").read().split('---',2)[1])
