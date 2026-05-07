@@ -2,7 +2,7 @@
 
 > Claude Code 플러그인 — 맥락을 모으고, 정리하고, 갈무리한다
 
-![version](https://img.shields.io/badge/version-0.0.2-blue)
+![version](https://img.shields.io/badge/version-0.0.3-blue)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![claude-code](https://img.shields.io/badge/claude--code-plugin-purple)
 
@@ -85,7 +85,7 @@ Claude Code 세션 안에서 실행:
 예상 출력:
 
 ```
-✓ Installed galmuri@0.0.2 — 5 skills registered (distill, explain, pitch, doc, deck)
+✓ Installed galmuri@0.0.3 — 5 skills registered (distill, explain, pitch, doc, deck)
 ```
 
 ### 3. 확인
@@ -232,14 +232,15 @@ Jobs-inspired 디자인 토큰 (SF Pro, 16:9, dark-light-dark 패턴) 기반 슬
 
 ## 하위 호환성
 
-`decide` 와 `shrink` 트리거는 현재 0.0.x 라인에서 문맥에 맞는 어댑터로 라우팅된다. **향후 릴리스에서 제거** 예정.
+`shrink` 는 호환성을 위해 유지되는 문맥 기반 alias 다. **향후 릴리스에서 제거** 예정.
 
-| 구 트리거 | 라우팅 대상 |
-|-------------|-----------|
-| `decide`, `결정` | `deck --preset decision-sandwich-6` |
-| `shrink`, `줄여줘`, `압축` | `explain` (짧은 원문) 또는 `doc` (긴 원문) |
+| 트리거 | 라우팅 대상 |
+|---------|-----------|
+| `shrink`, `줄여줘`, `압축` | `explain` (짧은 원문) 또는 `doc` (긴 원문); 사용자가 한 줄 / TL;DR 을 명시할 때 `pitch` |
 
-구 트리거 최초 사용 시 세션당 1회 deprecation 경고 출력.
+세션당 1회 deprecation 경고 출력.
+
+**0.0.3 에서 제거:** `decide` / `의사결정` / `결정해` 트리거는 더 이상 `deck` 으로 자동 라우팅되지 않는다. 2지선택 결정에는 `harnish:forki` 를, 슬라이드가 필요할 땐 `deck --preset decision-sandwich-6` 을 명시 호출.
 
 ## Contributing
 

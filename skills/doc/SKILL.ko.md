@@ -3,7 +3,24 @@ name: doc
 description: >
   문서형 정리 어댑터. distill 엔진을 호출하여 markdown 정리 후 파일로 남김. 기존 distill 저장 플로우 계승.
   Triggers: "문서로", "정리해서 저장", "doc", "기록으로", "shrink", "줄여줘", "압축"
-version: 0.0.2
+version: 0.0.3
+ssl:
+  scheduling:
+    anti_triggers:
+      - "사용자가 3–5줄 메시지를 원할 때 — pitch 사용"
+      - "파일 없이 인라인 출력만 원할 때 — explain 사용"
+  structural:
+    scenes: [Alias detection + Audience, Engine Invoke, Render, Save, Asset record]
+    resumable: false
+  logical:
+    tools: [Skill, Write, Bash]
+    side_effects:
+      reads: ["{input}", ".galmuri/tmp/source-{slug}.txt"]
+      writes: ["docs/galmuri-doc-{slug}.md", ".galmuri/assets/*.jsonl"]
+      deletes: []
+      network: []
+    idempotent: false
+    rollback: "PostToolUse 훅 실패 시 수동 복구: bash scripts/record-asset.sh ... (Step 5 참조)"
 ---
 
 # galmuri:doc — 문서형 정리

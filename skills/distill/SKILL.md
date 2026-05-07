@@ -3,7 +3,24 @@ name: distill
 description: >
   Core engine. Essence reduction + first-principles decomposition + Socratic validation. Invoked by adapters or directly. No persistence (adapters own that).
   Triggers: "distill", "핵심만", "본질", "distill engine"
-version: 0.0.2
+version: 0.0.3
+ssl:
+  scheduling:
+    anti_triggers:
+      - "When an adapter (explain/pitch/doc/deck) is more appropriate than direct engine invocation"
+      - "Inputs under 30 tokens — use chat directly"
+  structural:
+    scenes: [Input Capture, Mode Selection, Apply 3 Methods, Ratio Validation, Output]
+    resumable: true
+  logical:
+    tools: [Bash, Read]
+    side_effects:
+      reads: ["{input}", ".galmuri/tmp/retry-count.{slug}", "skills/distill/references/*"]
+      writes: [".galmuri/tmp/source-{slug}.txt", ".galmuri/tmp/retry-count.{slug}"]
+      deletes: [".galmuri/tmp/retry-count.{slug}"]
+      network: []
+    idempotent: false
+    rollback: "Counter file is cleared on Step 1 entry and Step 5 exit. Mid-flow LLM failures: re-run from Step 1."
 ---
 
 # galmuri:distill — Core Engine

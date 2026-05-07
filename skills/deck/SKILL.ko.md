@@ -2,8 +2,25 @@
 name: deck
 description: >
   덱 생성 어댑터. preset 선택 필수. SlideSpec JSON + 발표 스크립트 markdown 2파일 출력. 바이너리 빌드 없음.
-  Triggers: "덱", "슬라이드", "deck", "발표 자료", "decide", "의사결정", "A vs B", "결정해", "뭐가 나아"
-version: 0.0.2
+  Triggers: "덱", "슬라이드", "deck", "발표 자료", "A vs B", "뭐가 나아"
+version: 0.0.3
+ssl:
+  scheduling:
+    anti_triggers:
+      - "슬라이드 의도 없는 단일 binary 결정 — harnish:forki 사용"
+      - "슬라이드 없는 문서형 출력 — doc 사용"
+  structural:
+    scenes: [Preset selection, Engine Invoke, SlideSpec generation, Save]
+    resumable: false
+  logical:
+    tools: [Skill, Write]
+    side_effects:
+      reads: ["skills/deck/references/preset-{name}.md", "skills/deck/references/design-tokens.md"]
+      writes: ["docs/galmuri-deck-{slug}.json", "docs/galmuri-deck-{slug}.md"]
+      deletes: []
+      network: []
+    idempotent: false
+    rollback: "Save HITL 에서 사용자가 'n' 선택 → 파일 미생성"
 ---
 
 # galmuri:deck — 덱 생성 어댑터
@@ -12,16 +29,7 @@ version: 0.0.2
 - `scripts/preflight.sh` 통과.
 - `skills/distill/` 엔진 설치됨.
 
-## Step 1: Alias 감지 + Preset 선택 (필수)
-
-`decide` / `의사결정` / `A vs B` / `결정해` / `뭐가 나아` 키워드로 진입 시:
-```bash
-if [ ! -f ".galmuri/tmp/.warned-decide" ]; then
-  echo "[deprecated] 'decide' 트리거는 deck --preset decision-sandwich-6 으로 라우팅됩니다. 향후 릴리스에서 제거 예정." >&2
-  touch ".galmuri/tmp/.warned-decide"
-fi
-```
-alias 감지 시 `--preset decision-sandwich-6` 자동 주입.
+## Step 1: 프리셋 선택 (필수)
 
 `--preset` 플래그 누락 시 HITL:
 > "어떤 preset 을 사용할까요?

@@ -3,7 +3,28 @@ name: pitch
 description: >
   Three-to-five-line message adapter for sharing with others. Hook-Core-CTA structure. Audience query required. Optional file save.
   Triggers: "꽂아줘", "전달할 메시지", "pitch", "슬랙에 붙일", "DM 보낼", "shrink", "줄여줘", "압축"
-version: 0.0.2
+version: 0.0.3
+ssl:
+  scheduling:
+    anti_triggers:
+      - "When audience cannot be specified (pitch requires it)"
+      - "For documents over 800 tokens — use doc"
+  structural:
+    scenes: [Alias detection + Audience, Engine Invoke, Render, Save HITL]
+    resumable: false
+    branches:
+      - "shrink alias + long input + signal 'one line/TL;DR' → pitch handles it"
+      - "shrink alias + long input without one-line signal → delegate to doc"
+      - "shrink alias + short input → delegate to explain"
+  logical:
+    tools: [Skill, Write]
+    side_effects:
+      reads: ["{input}"]
+      writes: ["docs/galmuri-pitch-{slug}.md"]
+      deletes: []
+      network: []
+    idempotent: false
+    rollback: "User answers 'n' at Save HITL → no file created; stdout copy only."
 ---
 
 # galmuri:pitch — Outbound message adapter
@@ -17,6 +38,7 @@ version: 0.0.2
 **When triggered via `shrink` / `줄여줘` / `압축`:** warn once that the shrink alias is deprecated, then apply the routing rules below to decide whether pitch is the right adapter.
 
 Routing rules (apply in order):
+> Note: `ratio` here is **inferred** from the user's natural-language signal ("한 줄"/"TL;DR"/"one line") — it is not a user-input variable. The actual `--ratio` flag passed to distill is hardcoded in Step 2.
 - Input is **long (≥ 80 tokens) AND ratio ≤ 0.1** (or user says "one line" / "TL;DR") → pitch handles it, continue.
 - Input is **long AND ratio > 0.1** → tell the user: "This input is better suited for `/doc`. Please re-invoke as `/doc`." and stop.
 - Input is **short (< 80 tokens)** → tell the user: "Short input is better suited for `/explain`. Please re-invoke as `/explain`." and stop.

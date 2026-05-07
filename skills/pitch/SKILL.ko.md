@@ -3,7 +3,28 @@ name: pitch
 description: >
   타인 전달용 3~5줄 메시지 어댑터. Hook-Core-CTA 구조. audience 필수 질의. 파일 선택 저장.
   Triggers: "꽂아줘", "전달할 메시지", "pitch", "슬랙에 붙일", "DM 보낼", "shrink", "줄여줘", "압축"
-version: 0.0.2
+version: 0.0.3
+ssl:
+  scheduling:
+    anti_triggers:
+      - "audience 를 지정할 수 없는 상황 (pitch 는 audience 필수)"
+      - "800 토큰 초과 문서 — doc 사용"
+  structural:
+    scenes: [Alias detection + Audience, Engine Invoke, Render, Save HITL]
+    resumable: false
+    branches:
+      - "shrink alias + long input + signal 'one line/TL;DR' → pitch handles it"
+      - "shrink alias + long input without one-line signal → delegate to doc"
+      - "shrink alias + short input → delegate to explain"
+  logical:
+    tools: [Skill, Write]
+    side_effects:
+      reads: ["{input}"]
+      writes: ["docs/galmuri-pitch-{slug}.md"]
+      deletes: []
+      network: []
+    idempotent: false
+    rollback: "Save HITL 에서 사용자가 'n' 선택 → 파일 미생성, stdout 사본만"
 ---
 
 # galmuri:pitch — 전달용 메시지
@@ -17,6 +38,7 @@ version: 0.0.2
 **`shrink` / `줄여줘` / `압축` 키워드로 진입 시:** shrink alias 가 deprecated 됐다고 한 번 안내한 후, 아래 라우팅 규칙으로 pitch 가 적합한 어댑터인지 판단합니다.
 
 라우팅 규칙 (순서대로 적용):
+> 비고: 여기서 `ratio` 는 사용자의 자연어 신호 ("한 줄" / "TL;DR" / "one line") 로부터 **추론**되는 값이지 사용자 입력 변수가 아닙니다. distill 에 넘기는 실제 `--ratio` 플래그는 Step 2 에서 하드코딩됩니다.
 - 입력이 **길고 (≥ 80 토큰) AND ratio ≤ 0.1** (또는 사용자가 "한 줄로" / "TL;DR" 요청) → pitch 수행, 계속 진행.
 - 입력이 **길고 AND ratio > 0.1** → 사용자에게 안내: "이 분량은 `/doc`이 더 적합합니다. `/doc`으로 재호출해 주세요." 후 종료.
 - 입력이 **짧음 (< 80 토큰)** → 사용자에게 안내: "짧은 입력은 `/explain`이 더 적합합니다. `/explain`으로 재호출해 주세요." 후 종료.
