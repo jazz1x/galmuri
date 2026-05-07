@@ -7,12 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.0.3] — 2026-05-07
 
-Audit follow-up: every SKILL adopts the SSL (Scheduling-Structural-Logical) frontmatter contract, deck triggers narrow to resolve a collision with `harnish:forki`, and pitch's routing rule clarifies that `ratio` is inferred — not a user-input variable.
+Two changes ship together: every SKILL adopts the SSL (Scheduling-Structural-Logical) frontmatter contract, and a new 6th skill — `audit` — operationalizes that contract as a static analyzer for any SKILL.md. deck triggers narrow to resolve a collision with `harnish:forki`. pitch's routing rule clarifies that `ratio` is inferred — not a user-input variable.
 
 ### Added
 
-- **SSL frontmatter on all 5 skills**: every `SKILL.md` and `SKILL.ko.md` now declares an `ssl:` block with `scheduling.anti_triggers`, `structural.scenes`, `structural.resumable`, `logical.tools`, `logical.side_effects` (reads/writes/deletes/network), `logical.idempotent`, and `logical.rollback`. Surfaces the side-effect contract for static auditors and downstream consumers.
-- **+8 regression tests** (83 → 91): `ssl:` block presence, idempotent boolean type, scheduling.anti_triggers presence, en/ko parity for technical fields (scenes/tools/side_effects/idempotent), deck description triggers do not claim decide/의사결정/결정해, pitch ratio-inference disclaimer is pinned in body.
+- **`audit` skill** (`skills/audit/SKILL.md` + `SKILL.ko.md`) — galmuri's 6th skill. Static SSL decomposition for one or more SKILL.md files. Five scenes — Ingest → Decompose → Audit → Score → Report. Outputs CLI-friendly markdown (default `.galmuri/audit-{slug}.md`, `--stdout` for terminal, `--ci --threshold-logical=N` for non-zero exit on failure). Triggers: `skill audit`, `ssl audit`, `audit skill`, `ssl 분해`, `skill auditor`, `audit-skill`. Read-only by contract — never modifies originals. English-rooted triggers avoid Korean-stem collision with `harnish:ralphi`.
+- **SSL frontmatter on all 6 skills**: every `SKILL.md` and `SKILL.ko.md` declares an `ssl:` block with `scheduling.anti_triggers`, `structural.scenes`, `structural.resumable`, `logical.tools`, `logical.side_effects` (reads/writes/deletes/network), `logical.idempotent`, and `logical.rollback`. Surfaces the side-effect contract for static auditors and downstream consumers. The `audit` skill itself follows this contract (dogfood).
+- **+13 regression tests** (83 → 96): `ssl:` block presence, idempotent boolean type, `scheduling.anti_triggers` presence, en/ko parity for technical fields (scenes/tools/side_effects/idempotent), deck description triggers do not claim `decide`/`의사결정`/`결정해`, pitch ratio-inference disclaimer pinned in body, audit dir + .md/.ko.md exist, audit description excludes ralphi triggers, audit description includes a positive `ssl audit`/`skill audit` trigger, audit `anti_triggers` reference both `ralphi` and `forki` by name, audit `idempotent` is `true` (static analysis must be deterministic).
 
 ### Changed
 
@@ -20,6 +21,7 @@ Audit follow-up: every SKILL adopts the SSL (Scheduling-Structural-Logical) fron
 - **deck Step 1 simplified**: dropped the deprecation-warning bash block since the deprecated triggers are gone. Heading became `Step 1: Preset selection (required)`.
 - **pitch Step 1 prose**: added a one-line note that `ratio` in routing rules is inferred from natural-language signal ("한 줄"/"TL;DR"/"one line"), not a user-input variable. The hardcoded `--ratio 0.08` is in Step 2.
 - **explain forbidden-words test scoped to body**: the test now greps the body only (after the second `---`). Frontmatter `ssl:` blocks may legitimately mention `writes:` as part of the `side_effects` schema.
+- **README architecture diagram**: updated from "one engine + four adapters" to "one engine + four adapters + one meta-skill", with a new audit row in the skills table and `/galmuri:audit` in the slash-command verify list. Install output reads `6 skills registered (..., audit)`.
 
 ### Removed
 

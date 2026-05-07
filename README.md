@@ -12,7 +12,7 @@
 
 ## Architecture
 
-galmuri is organized as **one engine + four adapters**:
+galmuri is organized as **one engine + four adapters + one meta-skill**:
 
 ```
                     ┌─────────────────────────────────┐
@@ -30,6 +30,11 @@ galmuri is organized as **one engine + four adapters**:
                     │ decision-sandwich-6  pitch-deck   │
                     │ concept-explain      story-arc    │
                     └──────────────────────────────────┘
+
+                    ┌─────────────────────────────────┐
+                    │      audit (meta · read-only)    │
+                    │   SSL decomposition of any SKILL │
+                    └─────────────────────────────────┘
 ```
 
 | Skill | Role | Output |
@@ -39,6 +44,7 @@ galmuri is organized as **one engine + four adapters**:
 | **pitch** | Hook-Core-CTA in 3–5 lines for a named audience | stdout only |
 | **doc** | Distilled markdown saved to `docs/` | `docs/galmuri-doc-{slug}.md` |
 | **deck** | Structured slide copy (JSON + markdown) using Jobs-inspired design tokens | `galmuri-deck-{slug}.json` + `galmuri-deck-{slug}.md` |
+| **audit** | SSL (Scheduling-Structural-Logical) decomposition of any SKILL.md — read-only diagnostic | `.galmuri/audit-{slug}.md` or stdout |
 
 ## Install
 
@@ -66,6 +72,7 @@ explain
 pitch
 doc
 deck
+audit
 ```
 
 ### 1. Register the marketplace
@@ -85,7 +92,7 @@ Inside a Claude Code session, run:
 Expected output:
 
 ```
-✓ Installed galmuri@0.0.3 — 5 skills registered (distill, explain, pitch, doc, deck)
+✓ Installed galmuri@0.0.3 — 6 skills registered (distill, explain, pitch, doc, deck, audit)
 ```
 
 ### 3. Verify
@@ -94,7 +101,7 @@ Expected output:
 /plugin list
 ```
 
-All five slash commands should autocomplete:
+All six slash commands should autocomplete:
 
 ```
 /galmuri:distill
@@ -102,6 +109,7 @@ All five slash commands should autocomplete:
 /galmuri:pitch
 /galmuri:doc
 /galmuri:deck
+/galmuri:audit
 ```
 
 ### 4. (Optional) Install hooks

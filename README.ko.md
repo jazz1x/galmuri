@@ -12,7 +12,7 @@
 
 ## 아키텍처
 
-galmuri 는 **엔진 1개 + 어댑터 4개** 구조:
+galmuri 는 **엔진 1개 + 어댑터 4개 + 메타 스킬 1개** 구조:
 
 ```
                     ┌─────────────────────────────────┐
@@ -30,6 +30,11 @@ galmuri 는 **엔진 1개 + 어댑터 4개** 구조:
                     │ decision-sandwich-6  pitch-deck   │
                     │ concept-explain      story-arc    │
                     └──────────────────────────────────┘
+
+                    ┌─────────────────────────────────┐
+                    │     audit (메타 · 읽기 전용)       │
+                    │  SKILL.md SSL 분해 진단           │
+                    └─────────────────────────────────┘
 ```
 
 | Skill | 역할 | 출력 |
@@ -39,6 +44,7 @@ galmuri 는 **엔진 1개 + 어댑터 4개** 구조:
 | **pitch** | 지정 청자를 위한 Hook-Core-CTA 3–5줄 | stdout 전용 |
 | **doc** | 정제된 markdown → `docs/` 저장 | `docs/galmuri-doc-{slug}.md` |
 | **deck** | Jobs-inspired 디자인 토큰 기반 슬라이드 카피 (JSON + markdown) | `galmuri-deck-{slug}.json` + `galmuri-deck-{slug}.md` |
+| **audit** | 임의의 SKILL.md 에 대한 SSL(Scheduling-Structural-Logical) 분해 — 읽기 전용 진단 | `.galmuri/audit-{slug}.md` 또는 stdout |
 
 ## 설치
 
@@ -66,6 +72,7 @@ explain
 pitch
 doc
 deck
+audit
 ```
 
 ### 1. 마켓플레이스 등록
@@ -85,7 +92,7 @@ Claude Code 세션 안에서 실행:
 예상 출력:
 
 ```
-✓ Installed galmuri@0.0.3 — 5 skills registered (distill, explain, pitch, doc, deck)
+✓ Installed galmuri@0.0.3 — 6 skills registered (distill, explain, pitch, doc, deck, audit)
 ```
 
 ### 3. 확인
@@ -94,7 +101,7 @@ Claude Code 세션 안에서 실행:
 /plugin list
 ```
 
-아래 슬래시 명령 5개가 자동완성되면 정상:
+아래 슬래시 명령 6개가 자동완성되면 정상:
 
 ```
 /galmuri:distill
@@ -102,6 +109,7 @@ Claude Code 세션 안에서 실행:
 /galmuri:pitch
 /galmuri:doc
 /galmuri:deck
+/galmuri:audit
 ```
 
 ### 4. (선택) 훅 설치

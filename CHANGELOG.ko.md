@@ -7,12 +7,13 @@
 
 ## [0.0.3] — 2026-05-07
 
-Audit 후속: 5개 스킬 모두 SSL(Scheduling-Structural-Logical) frontmatter 계약을 채택, deck 트리거를 좁혀 `harnish:forki` 와의 충돌 해소, pitch 라우팅 룰의 `ratio` 가 사용자 입력 변수가 아님을 명시.
+두 변경이 함께 출시: 모든 스킬이 SSL(Scheduling-Structural-Logical) frontmatter 계약을 채택했고, 그 계약을 임의의 SKILL.md 에 적용하는 새 6번째 스킬 — `audit` — 가 추가됐다. deck 트리거를 좁혀 `harnish:forki` 와의 충돌 해소. pitch 라우팅 룰의 `ratio` 가 사용자 입력 변수가 아님을 명시.
 
 ### 추가
 
-- **5개 스킬 전체 SSL frontmatter**: 모든 `SKILL.md` 와 `SKILL.ko.md` 가 `scheduling.anti_triggers`, `structural.scenes`, `structural.resumable`, `logical.tools`, `logical.side_effects` (reads/writes/deletes/network), `logical.idempotent`, `logical.rollback` 을 포함한 `ssl:` 블록 선언. 정적 auditor 와 하류 consumer 를 위한 부작용 계약을 표면화.
-- **회귀 테스트 +8건** (83 → 91): `ssl:` 블록 존재, idempotent 가 boolean 타입, scheduling.anti_triggers 존재, 기술 필드 en/ko 동치 (scenes/tools/side_effects/idempotent), deck 트리거에 decide/의사결정/결정해 없음, pitch ratio 추론 disclaimer 본문 고정.
+- **`audit` 스킬** (`skills/audit/SKILL.md` + `SKILL.ko.md`) — galmuri 의 6번째 스킬. 단일 또는 다수 SKILL.md 에 대한 정적 SSL 분해. 5개 씬 — Ingest → Decompose → Audit → Score → Report. CLI 친화적 markdown 출력 (기본 `.galmuri/audit-{slug}.md`, `--stdout` 시 터미널, `--ci --threshold-logical=N` 시 임계값 미달 스킬이 있으면 non-zero exit). 트리거: `skill audit`, `ssl audit`, `audit skill`, `ssl 분해`, `skill auditor`, `audit-skill`. contract 상 읽기 전용 — 원본을 수정하지 않음. 영문 기반 트리거로 `harnish:ralphi` 와의 한국어 stem 충돌 회피.
+- **6개 스킬 전체 SSL frontmatter**: 모든 `SKILL.md` 와 `SKILL.ko.md` 가 `scheduling.anti_triggers`, `structural.scenes`, `structural.resumable`, `logical.tools`, `logical.side_effects` (reads/writes/deletes/network), `logical.idempotent`, `logical.rollback` 을 포함한 `ssl:` 블록 선언. 정적 auditor 와 하류 consumer 를 위한 부작용 계약을 표면화. `audit` 스킬 자체도 이 계약을 따름 (dogfood).
+- **회귀 테스트 +13건** (83 → 96): `ssl:` 블록 존재, idempotent 가 boolean 타입, `scheduling.anti_triggers` 존재, 기술 필드 en/ko 동치 (scenes/tools/side_effects/idempotent), deck 트리거에 `decide`/`의사결정`/`결정해` 없음, pitch ratio 추론 disclaimer 본문 고정, audit 디렉터리 + .md/.ko.md 양쪽 존재, audit description 에 ralphi 트리거 없음, audit description 에 `ssl audit`/`skill audit` positive 트리거 존재, audit `anti_triggers` 가 `ralphi` 와 `forki` 를 명시, audit `idempotent: true` (정적 분석은 결정적이어야 함).
 
 ### 변경
 
@@ -20,6 +21,7 @@ Audit 후속: 5개 스킬 모두 SSL(Scheduling-Structural-Logical) frontmatter 
 - **deck Step 1 간소화**: deprecated 트리거가 사라졌으므로 deprecation 경고 bash 블록 제거. 헤딩을 `Step 1: 프리셋 선택 (필수)` 로 변경.
 - **pitch Step 1 본문**: 라우팅 룰의 `ratio` 는 자연어 신호 (`한 줄` / `TL;DR` / `one line`) 로부터 **추론**되는 값이지 사용자 입력 변수가 아님을 한 줄로 명시. 실제 `--ratio 0.08` 은 Step 2 에서 하드코딩.
 - **explain forbidden-words 테스트 본문 한정**: 두 번째 `---` 이후 본문만 grep. frontmatter 의 `ssl:` 블록이 `side_effects` 스키마의 일부로 `writes:` 를 정당하게 언급할 수 있도록.
+- **README 아키텍처 다이어그램**: "엔진 1 + 어댑터 4" 에서 "엔진 1 + 어댑터 4 + 메타 스킬 1" 로 갱신, skills 표에 audit 행 추가, 슬래시 명령 verify 목록에 `/galmuri:audit` 추가. 설치 출력은 `6 skills registered (..., audit)` 로 변경.
 
 ### 제거
 

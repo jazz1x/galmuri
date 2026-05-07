@@ -275,3 +275,45 @@ PY
   run grep -qE 'ratio.*inferred|inferred.*ratio' "$REPO_ROOT/skills/pitch/SKILL.md"
   [ "$status" -eq 0 ]
 }
+
+# ── audit skill: trigger disambiguation from harnish:ralphi/forki ──────────────
+
+@test "skills/audit directory exists with both .md and .ko.md" {
+  [ -f "$REPO_ROOT/skills/audit/SKILL.md" ]
+  [ -f "$REPO_ROOT/skills/audit/SKILL.ko.md" ]
+}
+
+@test "audit/SKILL.md description triggers do not claim 점검해/검증해 (ralphi territory)" {
+  # Substring check on the description line — these are harnish:ralphi triggers.
+  run bash -c "! awk '/^---\$/{c++; next} c==1' '$REPO_ROOT/skills/audit/SKILL.md' \
+    | grep -E '\"점검해\"|\"검증해\"|\"확인해\"|\"셀프점검\"'"
+  [ "$status" -eq 0 ]
+}
+
+@test "audit/SKILL.md description includes a positive ssl/audit trigger" {
+  run bash -c "awk '/^---\$/{c++; next} c==1' '$REPO_ROOT/skills/audit/SKILL.md' \
+    | grep -qE '\"ssl audit\"|\"skill audit\"|\"audit skill\"'"
+  [ "$status" -eq 0 ]
+}
+
+@test "audit/SKILL.md anti_triggers reference ralphi and forki by name" {
+  run python3 - <<'PY'
+import yaml
+fm = yaml.safe_load(open("skills/audit/SKILL.md").read().split('---',2)[1])
+at = fm['ssl']['scheduling']['anti_triggers']
+joined = ' '.join(at)
+assert 'ralphi' in joined, f"audit anti_triggers should mention ralphi: {at}"
+assert 'forki' in joined, f"audit anti_triggers should mention forki: {at}"
+PY
+  [ "$status" -eq 0 ]
+}
+
+@test "audit/SKILL.md is declared idempotent (static analysis must be deterministic)" {
+  run python3 - <<'PY'
+import yaml
+fm = yaml.safe_load(open("skills/audit/SKILL.md").read().split('---',2)[1])
+val = fm['ssl']['logical']['idempotent']
+assert val is True, f"audit must be idempotent: true (got {val!r})"
+PY
+  [ "$status" -eq 0 ]
+}
