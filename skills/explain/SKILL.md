@@ -13,6 +13,9 @@ ssl:
   structural:
     scenes: [Alias detection + Input Capture, Engine Invoke, Render, Output]
     resumable: false
+    branches:
+      - "shrink alias + source_tokens < 80 → explain handles it"
+      - "shrink alias + source_tokens ≥ 80 → delegate to doc/pitch (see pitch routing)"
   logical:
     tools: [Bash, Skill]
     side_effects:
@@ -21,7 +24,7 @@ ssl:
       deletes: []
       network: []
     idempotent: false
-    rollback: null
+    rollback: ".galmuri/tmp/source-{slug}.txt is cleaned by the session-end hook; mid-flow LLM failure → re-run from Step 1."
 ---
 
 # galmuri:explain — Inline reader-side summary

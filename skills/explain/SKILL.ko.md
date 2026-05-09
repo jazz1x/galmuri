@@ -13,6 +13,9 @@ ssl:
   structural:
     scenes: [Alias detection + Input Capture, Engine Invoke, Render, Output]
     resumable: false
+    branches:
+      - "shrink alias + source_tokens < 80 → explain 처리"
+      - "shrink alias + source_tokens ≥ 80 → doc/pitch 위임 (pitch 라우팅 참고)"
   logical:
     tools: [Bash, Skill]
     side_effects:
@@ -21,7 +24,7 @@ ssl:
       deletes: []
       network: []
     idempotent: false
-    rollback: null
+    rollback: ".galmuri/tmp/source-{slug}.txt 는 세션 종료 훅이 자동 정리. 중간 LLM 실패 시 → Step 1 부터 재실행."
 ---
 
 # galmuri:explain — 나 이해용 정리

@@ -12,6 +12,10 @@ ssl:
   structural:
     scenes: [Input Capture, Mode Selection, Apply 3 Methods, Ratio Validation, Output]
     resumable: true
+    branches:
+      - "--mode omitted → Step 2 (mode selection); --mode specified → skip to Step 3"
+      - "Step 3 retry-count < 2 → re-enter Step 3; ≥ 2 → fall through to Step 5 HITL"
+      - "Step 5 validate-essence pass → emit JSON; fail → exit 1 + HITL [a]ccept/[r]e-target/[c]ancel"
   logical:
     tools: [Bash, Read]
     side_effects:

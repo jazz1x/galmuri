@@ -12,6 +12,10 @@ ssl:
   structural:
     scenes: [Input Capture, Mode Selection, Apply 3 Methods, Ratio Validation, Output]
     resumable: true
+    branches:
+      - "--mode 미지정 → Step 2 (mode selection); --mode 지정 → Step 3 로 점프"
+      - "Step 3 retry-count < 2 → Step 3 재진입; ≥ 2 → Step 5 HITL 로 폴스루"
+      - "Step 5 validate-essence 통과 → JSON 출력 / 실패 → exit 1 + HITL [a]ccept/[r]e-target/[c]ancel"
   logical:
     tools: [Bash, Read]
     side_effects:

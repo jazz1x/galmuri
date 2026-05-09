@@ -12,6 +12,11 @@ ssl:
   structural:
     scenes: [Alias detection + Audience, Engine Invoke, Render, Save, Asset record]
     resumable: false
+    branches:
+      - "shrink alias + source_tokens ≥ 80 AND 추론 ratio > 0.1 → doc 처리"
+      - "shrink alias + source_tokens < 80 → explain 위임"
+      - "shrink alias + 추론 ratio ≤ 0.1 (한 줄 / TL;DR 신호) → pitch 위임"
+      - "Save HITL: y → 파일 + asset 기록 / n → stdout 만 / edit-slug → 슬러그 재명명 후 생성"
   logical:
     tools: [Skill, Write, Bash]
     side_effects:

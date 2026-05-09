@@ -12,6 +12,11 @@ ssl:
   structural:
     scenes: [Alias detection + Audience, Engine Invoke, Render, Save, Asset record]
     resumable: false
+    branches:
+      - "shrink alias + source_tokens ≥ 80 AND inferred ratio > 0.1 → doc handles it"
+      - "shrink alias + source_tokens < 80 → delegate to explain"
+      - "shrink alias + inferred ratio ≤ 0.1 (one-line / TL;DR signal) → delegate to pitch"
+      - "Save HITL: y → file + asset record; n → stdout only; edit-slug → rename then create"
   logical:
     tools: [Skill, Write, Bash]
     side_effects:
