@@ -31,8 +31,6 @@ ssl:
 
 # galmuri:audit — SKILL.md SSL auditor
 
-Static SSL decomposition of one or more SKILL.md files. Produces diagnosis + suggested patches. **Originals are never modified.**
-
 ## Prerequisites
 - `scripts/preflight.sh` passes (jq, bash, bats).
 - Python 3 with PyYAML for frontmatter parsing.
@@ -176,22 +174,6 @@ Batch-mode adds:
 
 Default report file: `.galmuri/audit-{slug}.md` (slug derived from target name). Use `--stdout` to print to terminal instead. Use `--ci --threshold-logical=N` to exit non-zero when any skill scores below `N` on the Logical layer.
 
-## Output Schema
-
-A markdown report (CLI-friendly) containing per-skill scorecards, Top-3 risks, suggested patches, and (in batch-mode) a collision matrix and tool dependency graph. No JSON output, no source modification.
-
-## What this skill does NOT do
-
-- ✗ Modify any `SKILL.md` (read-only by contract)
-- ✗ Execute any skill (static analysis only)
-- ✗ Generate new skills — that is `skill-creator` territory
-- ✗ General test / coverage inspection — that is `harnish:ralphi` territory
-- ✗ Decision forcing — that is `harnish:forki` territory
-- ✗ Freeform text summarization — that is `distill` / `explain` / `doc` territory
-
 ## Reference
 
-The SSL framework comes from:
-
-- arXiv:2604.24026 (Liang et al., 2026) — Scheduling-Structural-Logical skill decomposition
-- Schank & Abelson, *Scripts, Plans, Goals and Understanding* (1977) — theoretical roots
+SSL framework: arXiv:2604.24026 (Liang et al., 2026); Schank & Abelson, *Scripts, Plans, Goals and Understanding* (1977).

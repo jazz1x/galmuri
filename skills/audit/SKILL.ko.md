@@ -31,8 +31,6 @@ ssl:
 
 # galmuri:audit — SKILL.md SSL 감사기
 
-하나 또는 다수의 SKILL.md 파일에 대한 정적 SSL 분해. 진단과 패치 제안을 생성한다. **원본은 어떤 경우에도 수정되지 않는다.**
-
 ## Prerequisites
 - `scripts/preflight.sh` 통과 (jq, bash, bats).
 - frontmatter 파싱을 위한 PyYAML 가 설치된 Python 3.
@@ -176,22 +174,6 @@ Batch-mode 추가 항목:
 
 기본 리포트 파일: `.galmuri/audit-{slug}.md` (slug 는 대상 이름에서 파생). 터미널에 출력하려면 `--stdout`. CI 에서 Logical 점수가 `N` 미만일 때 비-제로 종료하려면 `--ci --threshold-logical=N`.
 
-## 출력 스키마
-
-스킬별 스코어카드, Top-3 위험, 패치 제안, 그리고 (batch-mode 한정) 충돌 매트릭스와 도구 의존성 그래프를 담은 마크다운 리포트 (CLI 친화). JSON 출력 없음, 원본 수정 없음.
-
-## 이 스킬이 하지 않는 일
-
-- ✗ 어떤 `SKILL.md` 도 수정하지 않음 (계약상 읽기 전용)
-- ✗ 어떤 스킬도 실행하지 않음 (정적 분석만)
-- ✗ 신규 스킬 생성 — `skill-creator` 영역
-- ✗ 일반적인 테스트 / 커버리지 점검 — `harnish:ralphi` 영역
-- ✗ 결정 강제 — `harnish:forki` 영역
-- ✗ 자유 형식 텍스트 요약 — `distill` / `explain` / `doc` 영역
-
 ## Reference
 
-SSL 프레임워크 출처:
-
-- arXiv:2604.24026 (Liang et al., 2026) — Scheduling-Structural-Logical skill decomposition
-- Schank & Abelson, *Scripts, Plans, Goals and Understanding* (1977) — 이론적 토대
+SSL 프레임워크: arXiv:2604.24026 (Liang et al., 2026); Schank & Abelson, *Scripts, Plans, Goals and Understanding* (1977).
