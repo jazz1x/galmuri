@@ -31,14 +31,14 @@ ssl:
 
 ## Step 1: Preset selection (required)
 
-When `--preset` is missing, ask via HITL:
-> "Which preset should we use? e.g. `decision-sandwich-6`, `pitch-deck`, `concept-explain`, `story-arc`
->  1. decision-sandwich-6 (decision deck, 6 slides)
->  2. pitch-deck (presentation, 3 slides)
->  3. concept-explain (concept introduction, 4–5 slides)
->  4. story-arc (variable length)"
+When `--preset` is missing, ask via HITL — *"Which preset? e.g. `pitch-deck` for a 3-slide presentation."* Selected preset resolves to `references/preset-{name}.md`.
 
-Selected preset file: `references/preset-{name}.md`
+| # | Preset | Shape |
+|---|---|---|
+| 1 | `decision-sandwich-6` | decision deck, 6 slides |
+| 2 | `pitch-deck` | presentation, 3 slides |
+| 3 | `concept-explain` | concept introduction, 4–5 slides |
+| 4 | `story-arc` | variable length |
 
 ## Step 2: Engine Invoke
 Pick mode/ratio from the preset (read the preset file's frontmatter):
@@ -51,14 +51,12 @@ EngineOutput.units + preset mapping → SlideSpec[]:
 - Apply the color/font tokens from `references/design-tokens.md`.
 
 ## Step 4: Save (2 files)
-1. `docs/galmuri-deck-{slug}.json` — SlideSpec JSON (for machine consumption).
-2. `docs/galmuri-deck-{slug}.md` — presentation script + visual cues (for humans).
+
+| File | Content |
+|---|---|
+| `docs/galmuri-deck-{slug}.json` | SlideSpec[] array (machine consumption) |
+| `docs/galmuri-deck-{slug}.md` | per-slide script + visual cues (humans) |
 
 > "Create both files? `docs/galmuri-deck-{slug}.{json,md}` (y/n/edit-slug)"
 
-**No binary build step.**
-Do not introduce logic that emits native presentation-program file formats.
-
-## Output Schema
-- `docs/galmuri-deck-{slug}.json`: SlideSpec[] array.
-- `docs/galmuri-deck-{slug}.md`: per-slide script + visual cues.
+**No binary build step.** Do not introduce logic that emits native presentation-program file formats.
