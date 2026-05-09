@@ -2,6 +2,7 @@
 .galmuri/index.jsonl
 .galmuri/tmp/
 .galmuri/migration/
+.galmuri/audit-*.md
 .claude/settings.local.json
 .harnish/
 *.bak-*
