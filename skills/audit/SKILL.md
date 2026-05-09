@@ -3,7 +3,7 @@ name: audit
 description: >
   SKILL.md SSL (Scheduling-Structural-Logical) auditor. Decomposes a target SKILL.md (or a directory of skills) into the 3-layer frame, surfaces missing / ambiguous / risky declarations, and emits a diagnostic report. Read-only — never modifies originals. Use for self-review before PR, refactor regression checks, or bulk repo audits.
   Triggers: "skill audit", "ssl audit", "audit skill", "ssl 분해", "skill auditor", "audit-skill"
-version: 0.0.3
+version: 0.0.4
 ssl:
   scheduling:
     anti_triggers:

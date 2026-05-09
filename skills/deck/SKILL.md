@@ -3,7 +3,7 @@ name: deck
 description: >
   Deck generation adapter. Requires a preset selection. Emits two files — a SlideSpec JSON and a presentation script markdown. No binary build.
   Triggers: "덱 만들어", "슬라이드 만들어", "발표 자료", "deck 생성", "deck 만들어", "A vs B 슬라이드", "뭐가 나은지 슬라이드"
-version: 0.0.3
+version: 0.0.4
 ssl:
   scheduling:
     anti_triggers:

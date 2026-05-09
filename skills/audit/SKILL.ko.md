@@ -3,7 +3,7 @@ name: audit
 description: >
   SKILL.md SSL (Scheduling-Structural-Logical) 감사기. 대상 SKILL.md (또는 스킬 디렉터리) 를 3계층 프레임으로 분해하고, 누락 / 모호 / 위험한 선언을 드러내 진단 리포트로 출력한다. 읽기 전용 — 원본은 절대 수정하지 않는다. PR 직전 셀프 리뷰, 리팩터 회귀 점검, 리포지토리 일괄 감사에 사용한다.
   Triggers: "skill audit", "ssl audit", "audit skill", "ssl 분해", "skill auditor", "audit-skill"
-version: 0.0.3
+version: 0.0.4
 ssl:
   scheduling:
     anti_triggers:

@@ -5,6 +5,26 @@
 형식은 [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) 를 따릅니다.
 버전 관리는 [Semantic Versioning](https://semver.org/spec/v2.0.0.html) 을 준수합니다.
 
+## [0.0.4] — 2026-05-10
+
+0.0.3 에서 도입된 SSL 계약에 대한 셀프 감사 패스. `audit` 스킬을 나머지 5개에 적용해 Logical ✗ 1건 (`explain` 이 `idempotent: false` 인데 `rollback` 미선언) 과 Scheduling ⚠ 1건 (`deck` 의 1자 트리거 `덱` + generic `A vs B`) 을 발견·해소. 3개 스킬의 implicit branch 를 산문에서 frontmatter `branches:` 로 승격. `audit` / `distill` / `deck` 본문을 테이블·인라인 조건문으로 dense 화 — 정보 보존, EN −128 줄 (≈ 10 %).
+
+### 수정
+
+- **`explain` Logical ✗**: `idempotent: false` 선언 + `rollback: null` 이라 계약 위반. 세션 종료 hook 의 tmp 파일 정리를 참조하는 `rollback` 추가.
+- **`deck` Scheduling ⚠**: 1자 트리거 `덱` 과 generic `A vs B` 가 false-fire 위험이 너무 컸음. 멀티워드 형태 (`덱 만들어`, `슬라이드 만들어`, `발표 자료`, `deck 생성`, `deck 만들어`, `A vs B 슬라이드`, `뭐가 나은지 슬라이드`) 로 교체해 ≤ 4자 룰을 통과.
+- **`explain` / `doc` / `distill` Structural ⚠**: 라우팅 분기가 본문 산문에만 존재. frontmatter `branches:` 로 승격시켜 정적 감사 가능하게 함. `pitch` 는 이미 `branches:` 로 라우팅을 선언 중 — `explain` / `doc` 가 이를 미러해 `shrink` / `줄여줘` / `압축` 3-way alias 가 세 어댑터에 걸쳐 대칭 계약을 갖게 됨.
+
+### 변경
+
+- **`audit` 본문 dense화 (197 → 150 줄)**: 세 평행 체크리스트 (Scheduling / Structural / Logical, 줄 단위) 를 단일 Layer × Check × Failure 테이블로 통합. 점수 규칙 + 상태 임계값을 산문 두 줄로 압축. "두 가지 형태 지원" + 대상별 검증을 한 bash 블록 + 한 줄 기준으로 합침. batch-mode 추가 항목과 출력 위치 플래그는 인라인화. Step 5 와 `anti_triggers` 를 그대로 복제하던 `Output Schema` / `이 스킬이 하지 않는 일` 섹션 제거. Reference 는 한 줄로 축약.
+- **`distill` 본문 dense화 (135 → 120 줄)**: "3 Methods" 번호 목록을 # × Method × Reference × Output 테이블로 변환. Step 1 / 2 / 4 / 5 의 bash 직후 bullet recap (bash 내용을 그대로 다시 설명하던 것) 을 lead-in 한 줄씩으로 통합. Step 2 의 if/else 는 `&& / ||` 한 줄로 축약.
+- **`deck` 본문 dense화 (64 → 62 줄)**: preset HITL 리스트를 # × Preset × Shape 테이블로. 2-파일 저장 리스트를 File × Content 테이블로. Step 4 를 다시 풀어 쓰던 `Output Schema` 섹션은 Step 4 안으로 흡수.
+
+### 추가
+
+- **`.gitignore` 에 `.galmuri/audit-*.md` 추가**: audit 스킬의 기본 리포트 출력 위치가 `.galmuri/audit-{slug}.md` 라 진단 결과물이 추적되지 않도록 패턴 추가.
+
 ## [0.0.3] — 2026-05-07
 
 두 변경이 함께 출시: 모든 스킬이 SSL(Scheduling-Structural-Logical) frontmatter 계약을 채택했고, 그 계약을 임의의 SKILL.md 에 적용하는 새 6번째 스킬 — `audit` — 가 추가됐다. deck 트리거를 좁혀 `harnish:forki` 와의 충돌 해소. pitch 라우팅 룰의 `ratio` 가 사용자 입력 변수가 아님을 명시.

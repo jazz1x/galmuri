@@ -4,7 +4,7 @@ description: >
   Inline self-comprehension adapter. Calls the distill engine to extract the essence of long text and renders it as inline markdown.
   audience=me is auto-fixed. Output only — no file generation.
   Triggers: "설명해", "이해하게", "explain", "정리해서 보여줘", "readme 읽고", "shrink", "줄여줘", "압축"
-version: 0.0.3
+version: 0.0.4
 ssl:
   scheduling:
     anti_triggers:

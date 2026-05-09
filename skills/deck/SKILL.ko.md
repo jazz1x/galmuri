@@ -3,7 +3,7 @@ name: deck
 description: >
   덱 생성 어댑터. preset 선택 필수. SlideSpec JSON + 발표 스크립트 markdown 2파일 출력. 바이너리 빌드 없음.
   Triggers: "덱 만들어", "슬라이드 만들어", "발표 자료", "deck 생성", "deck 만들어", "A vs B 슬라이드", "뭐가 나은지 슬라이드"
-version: 0.0.3
+version: 0.0.4
 ssl:
   scheduling:
     anti_triggers:
