@@ -3,7 +3,7 @@ name: doc
 description: >
   문서형 정리 어댑터. distill 엔진을 호출하여 markdown 정리 후 파일로 남김. 기존 distill 저장 플로우 계승.
   Triggers: "문서로", "정리해서 저장", "doc", "기록으로", "shrink", "줄여줘", "압축"
-version: 0.0.3
+version: 0.0.4
 ssl:
   scheduling:
     anti_triggers:
@@ -12,6 +12,11 @@ ssl:
   structural:
     scenes: [Alias detection + Audience, Engine Invoke, Render, Save, Asset record]
     resumable: false
+    branches:
+      - "shrink alias + source_tokens ≥ 80 AND 추론 ratio > 0.1 → doc 처리"
+      - "shrink alias + source_tokens < 80 → explain 위임"
+      - "shrink alias + 추론 ratio ≤ 0.1 (한 줄 / TL;DR 신호) → pitch 위임"
+      - "Save HITL: y → 파일 + asset 기록 / n → stdout 만 / edit-slug → 슬러그 재명명 후 생성"
   logical:
     tools: [Skill, Write, Bash]
     side_effects:

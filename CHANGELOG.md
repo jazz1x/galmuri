@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.4] — 2026-05-10
+
+A self-audit pass over the SSL contract introduced in 0.0.3. The `audit` skill ran against the other five and found one Logical ✗ (`explain` declared `idempotent: false` without a `rollback`) and one Scheduling ⚠ (`deck` had a 1-character trigger `덱` plus generic `A vs B`). Both fixed. Implicit branches in three skills were promoted from prose into frontmatter `branches:` blocks. `audit` / `distill` / `deck` bodies were densified into tables and inline conditionals — content preserved, EN −128 lines (≈ 10 %).
+
+### Fixed
+
+- **`explain` Logical ✗**: declared `idempotent: false` but `rollback: null`. Added `rollback` line referencing the session-end tmp cleanup hook.
+- **`deck` Scheduling ⚠**: 1-character trigger `덱` and the generic `A vs B` were extreme false-fire vectors. Replaced with multi-word forms (`덱 만들어`, `슬라이드 만들어`, `발표 자료`, `deck 생성`, `deck 만들어`, `A vs B 슬라이드`, `뭐가 나은지 슬라이드`) so the ≤ 4-char rule no longer applies.
+- **`explain` / `doc` / `distill` Structural ⚠**: routing branches lived only in body prose. Promoted into frontmatter `branches:` blocks so the contract is statically auditable. `pitch` already declared its routing as `branches:`; `explain` and `doc` now mirror it, making the `shrink` / `줄여줘` / `압축` 3-way alias contract symmetric across the three adapters.
+
+### Changed
+
+- **`audit` body densification (197 → 150 lines)**: three parallel checklists (Scheduling / Structural / Logical, line-by-line) collapsed into one Layer × Check × Failure table; penalty rules + status thresholds folded into two prose lines; "two shapes accepted" + per-target validation merged into one bash block + one criterion line; batch-mode additions and output-destination flags moved to inline form. Duplicated `Output Schema` and `What this skill does NOT do` sections (which restated Step 5 and `anti_triggers` respectively) removed. Reference section condensed to a one-liner.
+- **`distill` body densification (135 → 120 lines)**: "3 Methods" numbered list converted to a # × Method × Reference × Output table; post-bash bullet recaps in Steps 1 / 2 / 4 / 5 (which only restated their bash blocks) collapsed into a single lead-in sentence per step; Step 2 if/else expanded into a `&& / ||` one-liner.
+- **`deck` body densification (64 → 62 lines)**: preset HITL list replaced by a # × Preset × Shape table; two-file save list replaced by a File × Content table; `Output Schema` (which restated Step 4) absorbed into Step 4.
+
+### Added
+
+- **`.gitignore` entry for `.galmuri/audit-*.md`**: the audit skill's default report destination is `.galmuri/audit-{slug}.md`. Added the pattern so diagnostic outputs are not tracked.
+
 ## [0.0.3] — 2026-05-07
 
 Two changes ship together: every SKILL adopts the SSL (Scheduling-Structural-Logical) frontmatter contract, and a new 6th skill — `audit` — operationalizes that contract as a static analyzer for any SKILL.md. deck triggers narrow to resolve a collision with `harnish:forki`. pitch's routing rule clarifies that `ratio` is inferred — not a user-input variable.

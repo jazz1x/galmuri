@@ -3,7 +3,7 @@ name: distill
 description: >
   코어 엔진. 본질환원 + 제1원칙 분해 + 소크라테스 검증. 어댑터가 호출하거나 직접 호출 가능. 저장 없음 (어댑터 책임).
   Triggers: "distill", "핵심만", "본질", "distill engine"
-version: 0.0.3
+version: 0.0.4
 ssl:
   scheduling:
     anti_triggers:
@@ -12,6 +12,10 @@ ssl:
   structural:
     scenes: [Input Capture, Mode Selection, Apply 3 Methods, Ratio Validation, Output]
     resumable: true
+    branches:
+      - "--mode 미지정 → Step 2 (mode selection); --mode 지정 → Step 3 로 점프"
+      - "Step 3 retry-count < 2 → Step 3 재진입; ≥ 2 → Step 5 HITL 로 폴스루"
+      - "Step 5 validate-essence 통과 → JSON 출력 / 실패 → exit 1 + HITL [a]ccept/[r]e-target/[c]ancel"
   logical:
     tools: [Bash, Read]
     side_effects:
@@ -41,46 +45,38 @@ ssl:
 
 ## Step 1: 입력 캡처 [bash]
 
+소스 텍스트를 `.galmuri/tmp/source-{slug}.txt` 에 기록 + retry 카운터 초기화 (이전 세션 잔존 파일 정리). `--mode` 명시 시 Step 2 skip → Step 3.
+
 ```bash
 mkdir -p .galmuri/tmp
 SLUG=$(echo "$INPUT" | head -c 40 | tr -cs '[:alnum:]' '-' | tr '[:upper:]' '[:lower:]')
 cat > ".galmuri/tmp/source-${SLUG}.txt"
-# retry 카운터 초기화 (이전 세션 잔존 파일 정리)
 rm -f ".galmuri/tmp/retry-count.${SLUG}"
 ```
 
-- 소스 텍스트를 `.galmuri/tmp/source-{slug}.txt` 에 기록.
-- `--mode` 미지정 시 Step 2 로 진행. 지정 시 Step 2 skip → Step 3.
-
 ## Step 2: 모드 선택 [bash + HITL]
+
+`--mode` 명시 시 skip. 미지정 시: 토큰 수 기준 모드 제안 (`< 80` → construct, `≥ 80` → reduce) → HITL confirm — *"reduce / construct 중 무엇으로 진행? 예: reduce(요약), construct(구조 확장)."*
 
 ```bash
 TOKEN_JSON=$(bash scripts/count-tokens.sh ".galmuri/tmp/source-${SLUG}.txt")
 TOKEN_COUNT=$(printf '%s' "$TOKEN_JSON" | python3 -c "import sys,json; print(json.load(sys.stdin)['tokens'])")
-if [ "$TOKEN_COUNT" -lt 80 ]; then
-  echo "[distill] 짧은 입력 (${TOKEN_COUNT} tokens) → construct 모드 권장"
-else
-  echo "[distill] 긴 입력 (${TOKEN_COUNT} tokens) → reduce 모드 권장"
-fi
+[ "$TOKEN_COUNT" -lt 80 ] \
+  && echo "[distill] 짧은 입력 (${TOKEN_COUNT} tokens) → construct 모드 권장" \
+  || echo "[distill] 긴 입력 (${TOKEN_COUNT} tokens) → reduce 모드 권장"
 ```
-
-- `--mode` 명시 시 이 Step skip.
-- 미지정 시 토큰 수 기준으로 모드 제안 → HITL confirm.
 
 ## Step 3: 3 Methods 적용 [LLM]
 
-`references/prompt.md` + `references/decomposition.md` + `references/socratic_probe.md` 지시를 순서대로 적용:
+세 method reference 를 순서대로 적용:
 
-1. **Method 1 본질환원**: 각 claim → 주어-동사 한 줄 essence.
-2. **Method 2 제1원칙 분해**: D/E/V/R 4 질문 적용 (`--weak-decomposition` 시 Weak 모드).
-3. **Method 3 소크라테스 검증**: 3축 probe → 실패 unit 은 `dropped[]` 에 기록.
+| # | Method | Reference | Output |
+|---|---|---|---|
+| 1 | 본질환원 | `references/prompt.md` | 각 claim → 주어-동사 한 줄 essence |
+| 2 | 제1원칙 분해 | `references/decomposition.md` | D/E/V/R 4 질문 (`--weak-decomposition` 시 Weak 모드) |
+| 3 | 소크라테스 검증 | `references/socratic_probe.md` | 3축 probe → 실패 unit → `dropped[]` |
 
-**Retry 명세 (결정론)**:
-- Step A: essence_units 후보 생성.
-- Step B: `bash scripts/validate-essence.sh` 로 스키마 검증.
-- Step C: reduce 모드 시 `|actual_ratio - target_ratio| > 0.05` 이면 재적용 (최대 2회).
-
-retry 카운터 관리 (bash):
+**Retry 명세 (결정론)**: (A) `essence_units` 후보 생성 → (B) `bash scripts/validate-essence.sh` 스키마 검증 → (C) reduce 모드에서 `|actual_ratio − target_ratio| > 0.05` 시 재적용 (최대 2회; 초과 시 Step 5 HITL 분기로 이동).
 
 ```bash
 COUNT_FILE=".galmuri/tmp/retry-count.${SLUG}"
@@ -88,34 +84,27 @@ CURRENT=$(cat "$COUNT_FILE" 2>/dev/null || echo 0)
 echo $((CURRENT + 1)) > "$COUNT_FILE"
 ```
 
-2 초과 시 Step 5 의 HITL 분기로 이동.
-
 ## Step 4: Ratio 검증 [bash] (reduce 모드만)
+
+Step 3 LLM 루프 만료 후 최종 판정. `|편차| > 0.05` 지속 시 retry-count 확인 → 2 미만이면 Step 3 재진입, 2 이상이면 Step 5 HITL.
 
 ```bash
 bash scripts/validate-essence.sh < output.json
 bash scripts/count-tokens.sh output.json
 ```
 
-- Step 3 LLM 루프 만료 후 최종 판정.
-- ratio 편차 > 0.05 지속 시 retry-count 확인 → 2 미만이면 Step 3 재진입, 2 이상이면 Step 5 HITL.
-
 ## Step 5: 출력 [bash]
+
+`validate-essence.sh` 통과 강제 → EngineOutput JSON 출력. 실패 → exit 1 + HITL (`[a]ccept / [r]e-target / [c]ancel`). 정상/HITL 어느 경로든 종료 직전 retry 카운터 정리.
 
 ```bash
 bash scripts/validate-essence.sh < final-output.json || {
-  echo "[distill] 검증 실패"
-  # HITL: [a]ccept / [r]e-target / [c]ancel
+  echo "[distill] 검증 실패"   # HITL: [a]ccept / [r]e-target / [c]ancel
   exit 1
 }
 cat final-output.json
-# 카운터 정리
 rm -f ".galmuri/tmp/retry-count.${SLUG}"
 ```
-
-- `validate-essence.sh` 최종 통과 강제 → EngineOutput JSON 출력.
-- 실패 시 exit 1 + HITL (`[a]ccept / [r]e-target / [c]ancel`).
-- 정상/HITL 어느 경로든 종료 직전 retry 카운터 파일 정리.
 
 ## 출력 스키마
 EngineOutput JSON (`essence-schema.json` 준수):

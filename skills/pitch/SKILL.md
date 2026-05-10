@@ -3,7 +3,7 @@ name: pitch
 description: >
   Three-to-five-line message adapter for sharing with others. Hook-Core-CTA structure. Audience query required. Optional file save.
   Triggers: "꽂아줘", "전달할 메시지", "pitch", "슬랙에 붙일", "DM 보낼", "shrink", "줄여줘", "압축"
-version: 0.0.3
+version: 0.0.4
 ssl:
   scheduling:
     anti_triggers:

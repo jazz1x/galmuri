@@ -3,7 +3,7 @@ name: doc
 description: >
   Document adapter. Calls the distill engine, formats the result as markdown, and saves it to a file. Inherits the prior distill save flow.
   Triggers: "문서로", "정리해서 저장", "doc", "기록으로", "shrink", "줄여줘", "압축"
-version: 0.0.3
+version: 0.0.4
 ssl:
   scheduling:
     anti_triggers:
@@ -12,6 +12,11 @@ ssl:
   structural:
     scenes: [Alias detection + Audience, Engine Invoke, Render, Save, Asset record]
     resumable: false
+    branches:
+      - "shrink alias + source_tokens ≥ 80 AND inferred ratio > 0.1 → doc handles it"
+      - "shrink alias + source_tokens < 80 → delegate to explain"
+      - "shrink alias + inferred ratio ≤ 0.1 (one-line / TL;DR signal) → delegate to pitch"
+      - "Save HITL: y → file + asset record; n → stdout only; edit-slug → rename then create"
   logical:
     tools: [Skill, Write, Bash]
     side_effects:
